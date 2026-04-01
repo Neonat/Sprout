@@ -8,12 +8,20 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.g4ng.logic.PlantFactory;
 import com.g4ng.plantemon.R;
+import com.g4ng.model.Player;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private Player currentPlayer;
+    private PlantFactory plantFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        currentPlayer = new Player("Bob", new ArrayList<>());
+        plantFactory = new PlantFactory();
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);

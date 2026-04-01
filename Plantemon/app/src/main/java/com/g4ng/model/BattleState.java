@@ -1,4 +1,7 @@
 package com.g4ng.model;
-
-public class BattleState {
+public enum BattleState {
+    P1_MOVE,
+    P2_MOVE,
+    PROCESSING,
+    END
 }
