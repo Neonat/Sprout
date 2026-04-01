@@ -9,7 +9,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.g4ng.logic.PlantFactory;
-import com.g4ng.plantemon.R;
+import com.g4ng.ui.R;
 import com.g4ng.model.Player;
 
 import java.util.ArrayList;

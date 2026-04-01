@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -10,6 +12,10 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.g4ng.plantemon"
         minSdk = 29
@@ -18,6 +24,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val localProps = Properties()
+        val localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
+        buildConfigField("String", "FLUX_API_KEY", "\"${localProps.getProperty("FLUX_API_KEY", "")}\"")
     }
 
     buildTypes {
