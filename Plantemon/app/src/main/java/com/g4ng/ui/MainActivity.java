@@ -1,4 +1,4 @@
-package com.g4ng.plantemon;
+package com.g4ng.ui;
 
 import android.os.Bundle;
 
@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.g4ng.plantemon.R;
 
 public class MainActivity extends AppCompatActivity {
 
