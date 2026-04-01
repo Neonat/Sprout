@@ -1,4 +1,4 @@
-package com.g4ng.plantemon;
+package com.g4ng.ui;
 
 import org.junit.Test;
 
