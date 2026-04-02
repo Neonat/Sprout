@@ -14,6 +14,14 @@ import android.util.Log;
 
 
 // Singleton class to fetch JSON data and turn it into a hash map
+// JSON will contain an array of objects
+// Example of a plant object
+//{
+//  id: "3qi83nhg98hg",
+//  name: "Iris setosa",
+//  moveset: [some array of ids],
+//  stats: { some other object here }
+//}
 public class PlantBase {
     private static PlantBase instance;
     private final HashMap<String, Model> plantData;
@@ -45,7 +53,12 @@ public class PlantBase {
 
         int length = 0;
         if (moveIdsRaw == null) {
+            // first four moveIds are for generic moves that can apply to any plant
+            // basically the normal type
             moveIds.add(0);
+            moveIds.add(1);
+            moveIds.add(2);
+            moveIds.add(3);
         }
         else {
             length = moveIdsRaw.length();

@@ -11,6 +11,14 @@ import android.util.Log;
 import com.g4ng.logic.Move;
 
 // Singleton class to load JSON data and turn it into a hash map
+// JSON will contain an array of objects
+// Example of a move object
+//{
+//    id: 19i,
+//    name: "Thunderbolt",
+//    attack: 10,
+//    defence: -3
+//}
 public class MoveBase {
     private static MoveBase instance;
     private final HashMap<Integer, Move> moveData;
