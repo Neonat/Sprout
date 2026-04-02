@@ -18,6 +18,10 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.g4ng.plantemon"
         minSdk = 29
@@ -34,6 +38,10 @@ android {
 
     buildFeatures {
         buildConfig = true
+        val localProps = Properties()
+        val localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
+        buildConfigField("String", "FLUX_API_KEY", "\"${localProps.getProperty("FLUX_API_KEY", "")}\"")
     }
 
     buildTypes {
