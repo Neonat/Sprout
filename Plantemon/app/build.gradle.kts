@@ -12,11 +12,7 @@ if (localPropertiesFile.exists()) {
 
 android {
     namespace = "com.g4ng.ui"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -25,23 +21,18 @@ android {
     defaultConfig {
         applicationId = "com.g4ng.plantemon"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Load the API Key from local.properties
-        val apiKey = localProperties.getProperty("PLANT_API_KEY") ?: ""
-        buildConfigField("String", "PLANT_API_KEY", "\"$apiKey\"")
-    }
+        // Load the API Keys from local.properties
+        val plantApiKey = localProperties.getProperty("PLANT_API_KEY") ?: ""
+        buildConfigField("String", "PLANT_API_KEY", "\"$plantApiKey\"")
 
-    buildFeatures {
-        buildConfig = true
-        val localProps = Properties()
-        val localPropsFile = rootProject.file("local.properties")
-        if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
-        buildConfigField("String", "FLUX_API_KEY", "\"${localProps.getProperty("FLUX_API_KEY", "")}\"")
+        val fluxApiKey = localProperties.getProperty("FLUX_API_KEY") ?: ""
+        buildConfigField("String", "FLUX_API_KEY", "\"$fluxApiKey\"")
     }
 
     buildTypes {
