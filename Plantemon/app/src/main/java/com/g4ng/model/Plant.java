@@ -11,7 +11,7 @@ public class Plant {
     private final String name;
     private int maxHealth;
     private int currentHealth;
-    private final int speed;
+    private int speed;
     private List<Move> moves;
     private Object sprite;
 
@@ -26,21 +26,18 @@ public class Plant {
     private String toxicity;
     private String bestWatering;
 
-    public Plant(String name, Object sprite) {
+    public Plant(String name, int speed, Object sprite) {
         this.id = UUID.randomUUID();
         this.name = name;
         this.maxHealth = 100;
         this.currentHealth = maxHealth;
-        this.speed = generateRandomSpeed();
+        this.speed = speed;
         this.sprite = sprite;
         this.moves = new ArrayList<>();
     }
 
-    public int generateRandomSpeed() {
-        return (int) (Math.random() * 100);
-    }
-
-    // Setters for metadata
+    // Setters
+    public void setSpeed(int speed) { this.speed = speed; }
     public void setCommonNames(List<String> commonNames) { this.commonNames = commonNames; }
     public void setDescription(String description) { this.description = description; }
     public void setTaxonomy(String taxonomy) { this.taxonomy = taxonomy; }
