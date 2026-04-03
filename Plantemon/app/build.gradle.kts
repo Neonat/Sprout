@@ -34,10 +34,6 @@ android {
         // Load the API Key from local.properties
         val apiKey = localProperties.getProperty("PLANT_API_KEY") ?: ""
         buildConfigField("String", "PLANT_API_KEY", "\"$apiKey\"")
-    }
-
-    buildFeatures {
-        buildConfig = true
         val localProps = Properties()
         val localPropsFile = rootProject.file("local.properties")
         if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
