@@ -18,7 +18,6 @@ android {
         }
     }
 
-
     buildFeatures {
         buildConfig = true
     }
@@ -60,7 +59,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.jackson.core)
     implementation(libs.okhttp)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
