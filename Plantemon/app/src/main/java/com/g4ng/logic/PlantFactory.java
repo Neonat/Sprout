@@ -22,7 +22,7 @@ public class PlantFactory {
             }
 
             String name = data.optString("name", "Unknown Plant");
-            Plant plant = new Plant(name, aiSprite);
+            Plant plant = new Plant(name, 10, aiSprite); // todo: decide how to fix the speed later
 
             // Extract metadata
             JSONArray commonNamesJson = data.optJSONArray("common_names");

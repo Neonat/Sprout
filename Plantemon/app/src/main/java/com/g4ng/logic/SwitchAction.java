@@ -1,24 +1,22 @@
 package com.g4ng.logic;
 
-import android.widget.Switch;
-
 import com.g4ng.model.Plant;
 import com.g4ng.model.Player;
 
-public class SwitchAction implements Action{
-    private final Player player;
+public class SwitchAction implements Action {
     private final Plant nextPlant;
 
-    public SwitchAction(Player player, Plant nextPlant){
-        this.player = player;
+    public SwitchAction(Plant nextPlant) {
         this.nextPlant = nextPlant;
     }
+
     @Override
-    public void doAction(){
-        player.setCurrentPlant(nextPlant);
-//        player.setCurrentAction(new SwitchAction());
-
+    public void execute(Player performer, Player opponent) {
+        if (nextPlant != null && !nextPlant.isDead()) {
+            System.out.println(performer.getUsername() + " switched to " + nextPlant.getName() + "!");
+            performer.setCurrentPlant(nextPlant);
+        } else {
+            System.out.println(performer.getUsername() + " failed to switch!");
+        }
     }
-
-
 }

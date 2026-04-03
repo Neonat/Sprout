@@ -31,13 +31,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Load the API Key from local.properties
-        val apiKey = localProperties.getProperty("PLANT_API_KEY") ?: ""
-        buildConfigField("String", "PLANT_API_KEY", "\"$apiKey\"")
-        val localProps = Properties()
-        val localPropsFile = rootProject.file("local.properties")
-        if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
-        buildConfigField("String", "FLUX_API_KEY", "\"${localProps.getProperty("FLUX_API_KEY", "")}\"")
+        // Load the API Keys from local.properties
+        val plantApiKey = localProperties.getProperty("PLANT_API_KEY") ?: ""
+        buildConfigField("String", "PLANT_API_KEY", "\"$plantApiKey\"")
+
+        val fluxApiKey = localProperties.getProperty("FLUX_API_KEY") ?: ""
+        buildConfigField("String", "FLUX_API_KEY", "\"$fluxApiKey\"")
     }
 
     buildTypes {
