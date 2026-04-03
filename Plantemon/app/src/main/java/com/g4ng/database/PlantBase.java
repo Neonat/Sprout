@@ -3,14 +3,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import android.util.Log;
+import android.content.Context;
+
+import com.g4ng.ui.R;
 
 
 // Singleton class to fetch JSON data and turn it into a hash map
@@ -19,40 +18,24 @@ import android.util.Log;
 //{
 //  id: "3qi83nhg98hg",
 //  name: "Iris setosa",
-//  moveset: [some array of ids],
-//  stats: { some other object here }
+//  moves: [some array of ids],
 //}
-public class PlantBase {
+public class PlantBase extends Base<String, PlantInit>{
     private static PlantBase instance;
-    private final HashMap<String, Model> plantData;
-    private PlantBase() {
+    private PlantBase(Context context) {
         // Read data from plant.json, get JSON object
-        plantData = new HashMap<>();
-        File file = new File("plant.json");
-        if (!file.exists()) {
-            throw new RuntimeException("plant.json not found");
-        }
-        try {
-            var data = new JSONArray(new String(Files.readAllBytes(file.toPath())));
-            for (int i = 0; i < data.length(); i++) {
-                addPlant(data.getJSONObject(i));
-            }
-        }
-        catch (IOException e) {
-            Log.e("PlantBase", "Error reading plant.json", e);
-        }
-        catch (JSONException e) {
-            Log.e("PlantBase", "Error parsing plant.json", e);
-        }
+        data = new HashMap<>();
+        read(context, R.raw.plants);
     }
 
-    private void addPlant(JSONObject data) throws IOException, JSONException {
+    @Override
+    protected void insert(JSONObject data) throws IOException, JSONException {
         String id = data.optString("id", "0");
         JSONArray moveIdsRaw = data.optJSONArray("moves");
         ArrayList<Integer> moveIds = new ArrayList<>();
 
         int length = 0;
-        if (moveIdsRaw == null) {
+        if (moveIdsRaw == null || moveIdsRaw.length() == 0) {
             // first four moveIds are for generic moves that can apply to any plant
             // basically the normal type
             moveIds.add(0);
@@ -66,26 +49,14 @@ public class PlantBase {
         for (int i = 0; i < length; i++) {
             moveIds.add(moveIdsRaw.getInt(i));
         }
-        Model model = new Model(id, moveIds);
-        plantData.put(id, model);
+        var model = new PlantInit(id, moveIds);
+        this.data.put(id, model);
     }
 
-    public static PlantBase getInstance() {
+    public static PlantBase getInstance(Context context) {
+        if (instance == null) {
+            instance = new PlantBase(context.getApplicationContext());
+        }
         return instance;
     }
-
-    public HashMap<String, Model> getData() {
-        return plantData;
-    }
-
-    public static class Model {
-        public final String id;
-        public final List<Integer> moveIds;
-
-        public Model(String id, List<Integer> moveIds) {
-            this.id = id;
-            this.moveIds = moveIds;
-        }
-    }
-
 }
