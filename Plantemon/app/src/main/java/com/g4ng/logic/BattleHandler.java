@@ -100,7 +100,8 @@ public abstract class BattleHandler {
     protected void executeSequence(Action firstAction, Action secondAction, Player firstPlayer, Player secondPlayer) {
         // First player acts
         if (firstAction != null && !firstPlayer.getCurrentPlant().isDead()) {
-            firstAction.execute(firstPlayer, secondPlayer);
+            // Updated to pass the opponent's action for defense calculation
+            firstAction.execute(firstPlayer, secondPlayer, secondAction);
         }
 
         // Check if second player's plant died
@@ -111,7 +112,8 @@ public abstract class BattleHandler {
 
         // Second player acts if they survived
         if (secondAction != null && !firstPlayer.getCurrentPlant().isDead()) {
-            secondAction.execute(secondPlayer, firstPlayer);
+            // Updated to pass the opponent's action for defense calculation
+            secondAction.execute(secondPlayer, firstPlayer, firstAction);
             
             // Check if first player's plant died after the counter-attack
             if (firstPlayer.getCurrentPlant().isDead()) {
