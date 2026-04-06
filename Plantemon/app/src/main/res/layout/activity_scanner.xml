@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#000000">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PLANT'EMON"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:padding="16dp" />
+
+    <!-- Download progress bar -->
+    <ProgressBar
+        android:id="@+id/progressBarDownload"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone" />
+
+    <!-- Download status text -->
+    <TextView
+        android:id="@+id/textViewDownloadStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:padding="4dp"
+        android:visibility="gone"
+        android:text="Downloading model..." />
+
+    <!-- Plant identified banner -->
+    <TextView
+        android:id="@+id/textViewPlantName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#2e7d32"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:padding="12dp"
+        android:text="Plant Identified: "
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/buttonShowPlantDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Show Plant Details"
+        android:layout_marginTop="4dp"
+        android:visibility="gone" />
+
+    <!-- Camera preview area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#1a5e1a">
+
+        <TextView
+            android:id="@+id/textViewCameraHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:text="When you open your camera,\nyour plant will show here!" />
+    </FrameLayout>
+
+    <!-- Bottom buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/buttonOpenCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open Camera to Scan"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/buttonCloseCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Close Camera"
+            android:visibility="gone"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/buttonGenerateSprite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#2e7d32"
+            android:textColor="#FFFFFF"
+            android:text="Generate Sprite"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>
