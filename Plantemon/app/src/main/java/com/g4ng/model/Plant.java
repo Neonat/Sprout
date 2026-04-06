@@ -56,8 +56,12 @@ public class Plant {
     public int getMaxHealth() { return maxHealth; }
     public int getCurrentHealth() { return currentHealth; }
     public void setCurrentHealth(int health) { this.currentHealth = health; }
-    public void takeDamage(int amount) { this.currentHealth = Math.max(this.currentHealth - amount, 0); }
-    public boolean isDead() { return currentHealth == 0; }
+    public void takeDamage(int amount) {
+        this.currentHealth = Math.max(this.currentHealth - amount, 0);
+    }
+    public boolean isDead() {
+        return currentHealth == 0;
+    }
     
     public List<String> getCommonNames() { return commonNames; }
     public String getDescription() { return description; }
