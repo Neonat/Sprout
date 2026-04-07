@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Camera permission for plant scanning -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Plant'Emon"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.A2d">
+
+        <!-- Main home screen (Kotlin/Compose) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Screen 1: Plant Scanner -->
+        <activity
+            android:name=".ScannerActivity"
+            android:exported="false" />
+
+        <!-- Screen 2: Sprite Generation -->
+        <activity
+            android:name=".SpriteActivity"
+            android:exported="false" />
+
+        <!-- Screen 3: Battle Arena -->
+        <activity
+            android:name=".BattleActivity"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
