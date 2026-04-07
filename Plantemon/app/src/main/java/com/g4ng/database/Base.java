@@ -9,8 +9,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public abstract class Base<K, V> {
@@ -20,7 +22,13 @@ public abstract class Base<K, V> {
     }
     protected void read(Context context, @RawRes int id) {
         try (InputStream is = context.getResources().openRawResource(id)) {
-            var data = new JSONArray(is.toString());
+            var reader = new BufferedReader(new InputStreamReader(is));
+            var stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            var data = new JSONArray(stringBuilder.toString());
             for (int i = 0; i < data.length(); i++) {
                 insert(data.getJSONObject(i));
             }
