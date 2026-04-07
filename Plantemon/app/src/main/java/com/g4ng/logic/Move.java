@@ -1,5 +1,6 @@
 package com.g4ng.logic;
 
+import android.util.Log;
 import com.g4ng.model.Plant;
 import com.g4ng.model.Player;
 
@@ -19,7 +20,7 @@ public class Move implements Action {
     }
 
     @Override
-    public void execute(Player performer, Player opponent, Action opponentAction) {
+    public String execute(Player performer, Player opponent, Action opponentAction) {
         Plant attackerPlant = performer.getCurrentPlant();
         Plant targetPlant = opponent.getCurrentPlant();
 
@@ -27,13 +28,16 @@ public class Move implements Action {
             int opponentDefense = (opponentAction != null) ? opponentAction.getDefenseValue() : 0;
             
             // Damage = Attack - Defense.
-            int damage = this.attack - opponentDefense;
+            int damage = Math.max(1, this.attack - opponentDefense);
             
             targetPlant.takeDamage(damage);
-            System.out.println(attackerPlant.getName() + " used " + name + " (Atk: " + attack + ") against " + 
-                               targetPlant.getName() + " (Def: " + opponentDefense + ") and dealt " + damage + " damage!");
+            String result = attackerPlant.getName() + " used " + name + " and dealt " + damage + " damage!";
+            Log.d("BattleLogic", result);
+            return result;
         } else {
-            System.out.println(attackerPlant.getName() + " missed " + name + "!");
+            String result = attackerPlant.getName() + " missed " + name + "!";
+            Log.d("BattleLogic", result);
+            return result;
         }
     }
 
