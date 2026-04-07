@@ -1,34 +1,18 @@
 package com.g4ng.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.g4ng.logic.PlantFactory;
-import com.g4ng.ui.R;
-import com.g4ng.model.Player;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private Player currentPlayer;
-    private PlantFactory plantFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        currentPlayer = new Player("Bob", new ArrayList<>());
-        plantFactory = new PlantFactory();
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        findViewById(R.id.btn_go_scan).setOnClickListener(v ->
+                startActivity(new Intent(this, ScanActivity.class)));
     }
 }
