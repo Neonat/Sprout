@@ -14,5 +14,8 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_go_scan).setOnClickListener(v ->
                 startActivity(new Intent(this, ScanActivity.class)));
+
+        findViewById(R.id.btn_go_battle).setOnClickListener(v ->
+                startActivity(new Intent(this, BattleActivity.class)));
     }
 }
