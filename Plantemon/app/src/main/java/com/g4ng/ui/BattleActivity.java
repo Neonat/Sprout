@@ -45,6 +45,8 @@ public class BattleActivity extends AppCompatActivity {
     }
 
     private void initializeUI() {
+        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
+
         tvPlayerUsername = findViewById(R.id.textViewPlayerUsername);
         tvPlayerPlantName = findViewById(R.id.textViewPlayerPlantName);
         tvPlayerHp = findViewById(R.id.textViewPlayerHp);
