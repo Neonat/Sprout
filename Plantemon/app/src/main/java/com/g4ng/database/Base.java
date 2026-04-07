@@ -40,6 +40,6 @@ public abstract class Base<K, V> {
             Log.e(getClass().getName(), "Error parsing json", e);
         }
     }
-    protected abstract void insert(JSONObject object) throws IOException, JSONException;
+    protected abstract void insert(JSONObject object) throws JSONException;
 
 }

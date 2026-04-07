@@ -3,14 +3,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
 
 import com.g4ng.ui.R;
-
 
 // Singleton class to fetch JSON data and turn it into a hash map
 // JSON will contain an array of objects
@@ -29,7 +27,7 @@ public class PlantBase extends Base<String, PlantInit>{
     }
 
     @Override
-    protected void insert(JSONObject data) throws IOException, JSONException {
+    protected void insert(JSONObject data) throws JSONException {
         String id = data.optString("id", "0");
         JSONArray moveIdsRaw = data.optJSONArray("moves");
         ArrayList<Integer> moveIds = new ArrayList<>();

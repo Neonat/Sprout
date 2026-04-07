@@ -1,15 +1,9 @@
 package com.g4ng.database;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.util.Log;
 import com.g4ng.logic.Move;
 import com.g4ng.ui.R;
 
@@ -32,7 +26,7 @@ public class MoveBase extends Base<Integer, Move> {
     }
 
     @Override
-    protected void insert(JSONObject data) throws IOException {
+    protected void insert(JSONObject data) {
         Integer id = data.optInt("id", 0);
         String name = data.optString("name", "Unknown Move");
         int attack = data.optInt("attack", 0);
