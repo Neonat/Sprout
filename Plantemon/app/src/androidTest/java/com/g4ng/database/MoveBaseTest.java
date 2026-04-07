@@ -51,10 +51,7 @@ public class MoveBaseTest {
         assertNotNull("Move with ID 4 (Solar Bloom) should exist", move);
         assertEquals("Solar Bloom", move.getName());
         assertEquals(3, move.getAttack());
-        
-        // Note: Currently MoveBase.java expects "defense" but JSON has "defence".
-        // This test currently expects 0 to match the current implementation.
-        assertEquals("Defense should be 0 due to 'defence' vs 'defense' mismatch in current implementation", 0, move.getDefense());
+        assertEquals(5, move.getDefense());
     }
 
     @Test

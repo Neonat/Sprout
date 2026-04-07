@@ -20,7 +20,7 @@ import com.g4ng.ui.R;
 //    id: 19i,
 //    name: "Thunderbolt",
 //    attack: 10,
-//    defence: -3
+//    defense: -3
 //}
 public class MoveBase extends Base<Integer, Move> {
     private static MoveBase instance;
@@ -45,7 +45,7 @@ public class MoveBase extends Base<Integer, Move> {
 
     public static MoveBase getInstance(Context context) {
         if (instance == null) {
-            return new MoveBase(context.getApplicationContext());
+            instance = new MoveBase(context.getApplicationContext());
         }
         return instance;
     }
