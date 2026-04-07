@@ -1,9 +1,6 @@
 package com.g4ng.database;
 
-import android.content.Context;
 import android.util.Log;
-
-import androidx.annotation.RawRes;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,8 +17,8 @@ public abstract class Base<K, V> {
     public HashMap<K, V> getData() {
         return data;
     }
-    protected void read(Context context, @RawRes int id) {
-        try (InputStream is = context.getResources().openRawResource(id)) {
+    public void read(InputStream is) {
+        try {
             var reader = new BufferedReader(new InputStreamReader(is));
             var stringBuilder = new StringBuilder();
             String line;

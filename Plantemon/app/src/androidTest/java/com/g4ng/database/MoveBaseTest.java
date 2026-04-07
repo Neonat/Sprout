@@ -3,16 +3,20 @@ package com.g4ng.database;
 import static org.junit.Assert.*;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.g4ng.logic.Move;
+import com.g4ng.ui.R;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -26,7 +30,13 @@ public class MoveBaseTest {
     @Before
     public void setUp() {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        moveBase = MoveBase.getInstance(context);
+        moveBase = MoveBase.getInstance();
+        try (InputStream is = context.getResources().openRawResource(R.raw.moves)) {
+            moveBase.read(is);
+        } catch (IOException e) {
+            Log.e("MoveBaseTest", "Failed to read moves.json", e);
+            fail("Failed to read moves.json");
+        }
     }
 
     @Test

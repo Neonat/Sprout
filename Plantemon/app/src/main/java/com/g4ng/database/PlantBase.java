@@ -3,12 +3,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import android.content.Context;
-
-import com.g4ng.ui.R;
 
 // Singleton class to fetch JSON data and turn it into a hash map
 // JSON will contain an array of objects
@@ -20,10 +17,9 @@ import com.g4ng.ui.R;
 //}
 public class PlantBase extends Base<String, PlantInit>{
     private static PlantBase instance;
-    private PlantBase(Context context) {
+    private PlantBase() {
         // Read data from plant.json, get JSON object
         data = new HashMap<>();
-        read(context, R.raw.plants);
     }
 
     @Override
@@ -51,9 +47,9 @@ public class PlantBase extends Base<String, PlantInit>{
         this.data.put(id, model);
     }
 
-    public static PlantBase getInstance(Context context) {
+    public static PlantBase getInstance() {
         if (instance == null) {
-            instance = new PlantBase(context.getApplicationContext());
+            instance = new PlantBase();
         }
         return instance;
     }

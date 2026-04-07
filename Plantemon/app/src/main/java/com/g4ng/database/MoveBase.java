@@ -1,11 +1,10 @@
 package com.g4ng.database;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.HashMap;
 
-import android.content.Context;
 import com.g4ng.logic.Move;
-import com.g4ng.ui.R;
 
 // Singleton class to load JSON data and turn it into a hash map
 // JSON will contain an array of objects
@@ -19,10 +18,9 @@ import com.g4ng.ui.R;
 public class MoveBase extends Base<Integer, Move> {
     private static MoveBase instance;
 
-    private MoveBase(Context context) {
+    private MoveBase() {
         // Read data from move.json, get JSON object
         data = new HashMap<>();
-        read(context, R.raw.moves);
     }
 
     @Override
@@ -37,9 +35,9 @@ public class MoveBase extends Base<Integer, Move> {
         this.data.put(id, model);
     }
 
-    public static MoveBase getInstance(Context context) {
+    public static MoveBase getInstance() {
         if (instance == null) {
-            instance = new MoveBase(context.getApplicationContext());
+            instance = new MoveBase();
         }
         return instance;
     }
