@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#000000">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#2e7d32"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/imageViewOpponentSprite"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="Opponent sprite" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/textViewOpponentName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:text="Opponent" />
+
+            <TextView
+                android:id="@+id/textViewOpponentHp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:text="HP: 100/100" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="BATTLE ARENA"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/textViewBattleLog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c62828"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:text="" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:padding="8dp">
+
+        <Button
+            android:id="@+id/buttonMove1"
+            android:layout_width="0dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Solar Bloom" />
+
+        <Button
+            android:id="@+id/buttonMove2"
+            android:layout_width="0dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Tidal Root Snare" />
+
+        <Button
+            android:id="@+id/buttonMove3"
+            android:layout_width="0dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Golden Pollen Burst" />
+
+        <Button
+            android:id="@+id/buttonMove4"
+            android:layout_width="0dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Sunpetal Burst" />
+    </GridLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#2e7d32"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/imageViewPlayerSprite"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="Player sprite" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/textViewPlayerName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:text="Your Plant" />
+
+            <TextView
+                android:id="@+id/textViewPlayerHp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:text="HP: 100/100" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/buttonUseSpecial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#1b5e20"
+            android:textColor="#FFFFFF"
+            android:text="Use Special"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+</LinearLayout>

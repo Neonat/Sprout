@@ -11,12 +11,18 @@ public class SwitchAction implements Action {
     }
 
     @Override
-    public void execute(Player performer, Player opponent) {
+    public void execute(Player performer, Player opponent, Action opponentAction) {
         if (nextPlant != null && !nextPlant.isDead()) {
             System.out.println(performer.getUsername() + " switched to " + nextPlant.getName() + "!");
             performer.setCurrentPlant(nextPlant);
         } else {
             System.out.println(performer.getUsername() + " failed to switch!");
         }
+    }
+
+    @Override
+    public int getDefenseValue() {
+        // Switching might leave you vulnerable (0 defense).
+        return 0;
     }
 }

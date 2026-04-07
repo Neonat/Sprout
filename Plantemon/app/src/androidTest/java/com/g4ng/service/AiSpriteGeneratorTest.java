@@ -26,7 +26,7 @@ public class AiSpriteGeneratorTest {
     @Test
     public void testGenerateSprite() throws Exception {
         AiSpriteGenerator generator = new AiSpriteGenerator();
-        byte[] result = (byte[]) generator.generateSprite(null);
+        byte[] result = generator.generateSprite("sunflower");
 
         assertNotNull("generateSprite returned null", result);
         assertTrue("generateSprite returned empty bytes — check Logcat for API error", result.length > 0);

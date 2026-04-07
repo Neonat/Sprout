@@ -13,7 +13,7 @@ public class Plant {
     private int currentHealth;
     private int speed;
     private List<Move> moves;
-    private Object sprite;
+    private byte[] sprite;
 
     // New metadata fields from API
     private List<String> commonNames;
@@ -26,7 +26,7 @@ public class Plant {
     private String toxicity;
     private String bestWatering;
 
-    public Plant(String name, int speed, Object sprite) {
+    public Plant(String name, int speed, byte[] sprite) {
         this.id = UUID.randomUUID();
         this.name = name;
         this.maxHealth = 100;
@@ -56,8 +56,12 @@ public class Plant {
     public int getMaxHealth() { return maxHealth; }
     public int getCurrentHealth() { return currentHealth; }
     public void setCurrentHealth(int health) { this.currentHealth = health; }
-    public void takeDamage(int amount) { this.currentHealth = Math.max(this.currentHealth - amount, 0); }
-    public boolean isDead() { return currentHealth == 0; }
+    public void takeDamage(int amount) {
+        this.currentHealth = Math.max(this.currentHealth - amount, 0);
+    }
+    public boolean isDead() {
+        return currentHealth == 0;
+    }
     
     public List<String> getCommonNames() { return commonNames; }
     public String getDescription() { return description; }
@@ -68,6 +72,8 @@ public class Plant {
     public String getCulturalSignificance() { return culturalSignificance; }
     public String getToxicity() { return toxicity; }
     public String getBestWatering() { return bestWatering; }
+
+    public byte[] getSprite() { return sprite; }
 
     public void addMove(Move move) { this.moves.add(move); }
     public void deleteMove(Move move) { this.moves.remove(move); }

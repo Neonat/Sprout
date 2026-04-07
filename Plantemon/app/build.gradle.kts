@@ -12,11 +12,7 @@ if (localPropertiesFile.exists()) {
 
 android {
     namespace = "com.g4ng.ui"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -25,7 +21,7 @@ android {
     defaultConfig {
         applicationId = "com.g4ng.plantemon"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -52,6 +48,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    compileSdkMinor = 1
 }
 
 dependencies {
