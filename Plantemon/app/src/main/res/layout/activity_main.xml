@@ -20,7 +20,7 @@
     <!-- Logo -->
     <ImageView
         android:id="@+id/iv_logo"
-        android:layout_width="200dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:src="@drawable/ic_logo"
@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.10" />
+        app:layout_constraintVertical_bias="0.20" />
 
     <!-- Garden nav (bottom-left) -->
     <LinearLayout
@@ -42,12 +42,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.15"
-        app:layout_constraintVertical_bias="0.82">
+        app:layout_constraintVertical_bias="0.55">
 
         <ImageView
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:scaleType="fitCenter"
+            android:rotation="-10"
             android:src="@drawable/ic_nav_garden" />
 
         <TextView
@@ -56,8 +57,8 @@
             android:text="Garden"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:textSize="13sp"
-            android:layout_marginTop="4dp" />
+            android:textSize="30sp"
+            android:layout_marginTop="-10dp" />
     </LinearLayout>
 
     <!-- Adventure nav (right, mid-screen) -->
@@ -71,12 +72,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.82"
-        app:layout_constraintVertical_bias="0.48">
+        app:layout_constraintHorizontal_bias="0.90"
+        app:layout_constraintVertical_bias="0.58">
 
         <ImageView
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:rotation="20"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_nav_adventure" />
 
@@ -86,8 +88,8 @@
             android:text="Adventure"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:textSize="13sp"
-            android:layout_marginTop="4dp" />
+            android:textSize="30sp"
+            android:layout_marginTop="-30dp" />
     </LinearLayout>
 
     <!-- Camera nav (bottom-center) -->
@@ -105,8 +107,9 @@
         app:layout_constraintVertical_bias="0.88">
 
         <ImageView
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:rotation="10"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_nav_camera" />
 
@@ -116,8 +119,9 @@
             android:text="Camera"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:textSize="13sp"
-            android:layout_marginTop="4dp" />
+            android:textSize="30sp"
+            android:layout_marginTop="-40dp"
+            android:includeFontPadding="false" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
