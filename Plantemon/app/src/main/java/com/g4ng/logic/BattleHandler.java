@@ -130,7 +130,13 @@ public abstract class BattleHandler {
         p1SelectedAction = null;
         p2SelectedAction = null;
     }
-
+    public boolean hasAvailablePlants(Player player) {
+        for (Plant plant : player.getGarden()){
+        if (!plant.isDead()) {
+            return true;
+        }}
+        return false;
+    }
     public BattleState getState() {
         return state;
     }
