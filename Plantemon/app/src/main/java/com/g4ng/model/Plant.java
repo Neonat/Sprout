@@ -2,11 +2,13 @@ package com.g4ng.model;
 
 import com.g4ng.logic.Move;
 
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class Plant {
+public class Plant implements Serializable {
     private final UUID id;
     private final String name;
     private int maxHealth;
@@ -14,6 +16,7 @@ public class Plant {
     private int speed;
     private List<Move> moves;
     private byte[] sprite;
+    private Date scanDateTime;
 
     // New metadata fields from API
     private List<String> commonNames;
@@ -34,6 +37,7 @@ public class Plant {
         this.speed = speed;
         this.sprite = sprite;
         this.moves = new ArrayList<>();
+        this.scanDateTime = new Date(); // Default to now
     }
 
     // Setters
@@ -47,6 +51,7 @@ public class Plant {
     public void setCulturalSignificance(String culturalSignificance) { this.culturalSignificance = culturalSignificance; }
     public void setToxicity(String toxicity) { this.toxicity = toxicity; }
     public void setBestWatering(String bestWatering) { this.bestWatering = bestWatering; }
+    public void setScanDateTime(Date scanDateTime) { this.scanDateTime = scanDateTime; }
 
     // Getters
     public UUID getId() { return id; }
@@ -72,6 +77,7 @@ public class Plant {
     public String getCulturalSignificance() { return culturalSignificance; }
     public String getToxicity() { return toxicity; }
     public String getBestWatering() { return bestWatering; }
+    public Date getScanDateTime() { return scanDateTime; }
 
     public byte[] getSprite() { return sprite; }
 

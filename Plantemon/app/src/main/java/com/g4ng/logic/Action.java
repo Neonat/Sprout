@@ -1,8 +1,9 @@
 package com.g4ng.logic;
 
 import com.g4ng.model.Player;
+import java.io.Serializable;
 
-public interface Action {
+public interface Action extends Serializable {
     /**
      * Executes the action and returns a string describing what happened.
      */
