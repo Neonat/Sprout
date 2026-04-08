@@ -40,8 +40,8 @@ public class InfoActivity extends AppCompatActivity {
         TextView tvMoves = findViewById(R.id.tv_info_moves);
 
         // Sprite
-        if (plant.getSprite() != null) {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(plant.getSprite(), 0, plant.getSprite().length);
+        if (plant.getSpritePath() != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(plant.getSpritePath());
             ivSprite.setImageBitmap(bitmap);
         }
 

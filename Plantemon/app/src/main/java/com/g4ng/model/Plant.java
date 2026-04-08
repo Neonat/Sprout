@@ -11,11 +11,11 @@ import java.util.Date;
 public class Plant implements Serializable {
     private final UUID id;
     private final String name;
-    private int maxHealth;
+    private final int maxHealth;
     private int currentHealth;
     private int speed;
-    private List<Move> moves;
-    private byte[] sprite;
+    private final List<Move> moves;
+    private final String spritePath;
     private Date scanDateTime;
 
     // New metadata fields from API
@@ -29,13 +29,13 @@ public class Plant implements Serializable {
     private String toxicity;
     private String bestWatering;
 
-    public Plant(String name, int speed, byte[] sprite) {
+    public Plant(String name, int speed, String spritePath) {
         this.id = UUID.randomUUID();
         this.name = name;
         this.maxHealth = 100;
         this.currentHealth = maxHealth;
         this.speed = speed;
-        this.sprite = sprite;
+        this.spritePath = spritePath;
         this.moves = new ArrayList<>();
         this.scanDateTime = new Date(); // Default to now
     }
@@ -79,7 +79,7 @@ public class Plant implements Serializable {
     public String getBestWatering() { return bestWatering; }
     public Date getScanDateTime() { return scanDateTime; }
 
-    public byte[] getSprite() { return sprite; }
+    public String getSpritePath() { return spritePath; }
 
     public void addMove(Move move) { this.moves.add(move); }
     public void deleteMove(Move move) { this.moves.remove(move); }

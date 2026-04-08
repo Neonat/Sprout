@@ -18,14 +18,11 @@ public class PlantFactory {
     private final String TAG = "PlantFactory";
 
     /** Assembles a Plant from an already-parsed API response and a generated sprite. */
-    // TODO: use a link to a saved resource instead of a byte array
-    // Ideally, the plants store a link to the sprite within the filesystem and not the entire sprite
-    // TODO: non-volatile plant storage
-    public Plant createFromApi(JSONObject data, byte[] sprite) {
+    public Plant createFromApi(JSONObject data, String spritePath) {
         if (data.has("error")) return null;
 
         String name = data.optString("name", "Unknown Plant");
-        Plant plant = new Plant(name, 10, sprite); // todo: decide how to handle speed
+        Plant plant = new Plant(name, 10, spritePath); // todo: decide how to handle speed
 
         JSONArray commonNamesJson = data.optJSONArray("common_names");
         if (commonNamesJson != null) {
@@ -64,7 +61,7 @@ public class PlantFactory {
         return plant;
     }
 
-    public Plant createFromScan(JSONObject data, byte[] sprite) {
-        return createFromApi(data, sprite);
+    public Plant createFromScan(JSONObject data, String spritePath) {
+        return createFromApi(data, spritePath);
     }
 }

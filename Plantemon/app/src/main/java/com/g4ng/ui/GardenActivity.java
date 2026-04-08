@@ -39,9 +39,9 @@ public class GardenActivity extends AppCompatActivity {
         for (int i = 0; i < pots.length; i++) {
             if (i < garden.size()) {
                 Plant plant = garden.get(i);
-                byte[] spriteBytes = plant.getSprite();
-                if (spriteBytes != null && spriteBytes.length > 0) {
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(spriteBytes, 0, spriteBytes.length);
+                String spritePath = plant.getSpritePath();
+                if (spritePath != null) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(spritePath);
                     pots[i].setImageBitmap(bitmap);
                 } else {
                     pots[i].setImageResource(R.drawable.ic_pot_empty);
