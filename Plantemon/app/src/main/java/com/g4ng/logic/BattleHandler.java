@@ -31,7 +31,6 @@ public abstract class BattleHandler {
         System.out.println(player1.getUsername() + " sends out " + player1.getCurrentPlant().getName());
         System.out.println(player2.getUsername() + " sends out " + player2.getCurrentPlant().getName());
     }
-
     public void applyAction(Player player, Action action) {
         if (player == player1) {
             p1SelectedAction = action;
@@ -73,6 +72,7 @@ public abstract class BattleHandler {
                 System.out.println("State transition: PROCESSING -> P1_MOVE (New Round)");
                 break;
         }
+        botCheck();
     }
 
     public void processTurn() {
@@ -96,6 +96,8 @@ public abstract class BattleHandler {
     }
 
     public abstract void updatePlayers();
+
+    protected abstract void botCheck();
 
     protected void executeSequence(Action firstAction, Action secondAction, Player firstPlayer, Player secondPlayer) {
         // First player acts

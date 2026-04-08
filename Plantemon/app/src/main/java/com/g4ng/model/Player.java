@@ -3,9 +3,9 @@ package com.g4ng.model;
 import java.util.List;
 
 public class Player {
-    private final String username;
-    private final List<Plant> garden;
-    private Plant currentPlant;
+    protected final String username;
+    protected final List<Plant> garden;
+    protected Plant currentPlant;
 
     public Player(String username, List<Plant> garden) {
         this.username = username;
