@@ -1,5 +1,7 @@
 package com.g4ng.logic;
 
+import android.util.Log;
+
 import com.g4ng.database.MoveBase;
 import com.g4ng.database.Taxonomy;
 import com.g4ng.database.TaxonomyMoveMapBase;
@@ -12,6 +14,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class PlantFactory {
+
+    private final String TAG = "PlantFactory";
 
     /** Assembles a Plant from an already-parsed API response and a generated sprite. */
     // TODO: use a link to a saved resource instead of a byte array
@@ -53,7 +57,9 @@ public class PlantFactory {
         ArrayList<Integer> moveIdsCopy = new ArrayList<>(moveIds);
         Collections.shuffle(moveIdsCopy);
         for (int i = 0; i < 4; i++) {
-            plant.addMove(moveBase.get(moveIdsCopy.get(i)));
+            var move = moveBase.get(moveIdsCopy.get(i));
+            Log.i(TAG, "createFromApi: " + plant.getName() + " has move " + move.getName());
+            plant.addMove(move);
         }
         return plant;
     }

@@ -1,5 +1,6 @@
 package com.g4ng.ui;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -37,15 +38,25 @@ public class GardenActivity extends AppCompatActivity {
 
         for (int i = 0; i < pots.length; i++) {
             if (i < garden.size()) {
-                byte[] spriteBytes = garden.get(i).getSprite();
+                Plant plant = garden.get(i);
+                byte[] spriteBytes = plant.getSprite();
                 if (spriteBytes != null && spriteBytes.length > 0) {
                     Bitmap bitmap = BitmapFactory.decodeByteArray(spriteBytes, 0, spriteBytes.length);
                     pots[i].setImageBitmap(bitmap);
                 } else {
                     pots[i].setImageResource(R.drawable.ic_pot_empty);
                 }
+                
+                // Clicking a pot with a plant opens the InfoActivity
+                pots[i].setOnClickListener(v -> {
+                    Intent intent = new Intent(this, InfoActivity.class);
+                    intent.putExtra("plant", plant);
+                    startActivity(intent);
+                });
+                
             } else {
                 pots[i].setImageResource(R.drawable.ic_pot_empty);
+                pots[i].setOnClickListener(null); // No info for empty pots
             }
             MainActivity.pressAnim(pots[i]);
         }
