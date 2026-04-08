@@ -26,6 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name="com.g4ng.ui.ScanActivity" />
+        <activity android:name="com.g4ng.ui.BattleActivity" />
+        <activity android:name="com.g4ng.ui.GardenActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -72,10 +72,9 @@ public class ScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Scan a Plant");
-        }
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
+
+        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
 
         btnScan = findViewById(R.id.btn_scan);
         progress = findViewById(R.id.progress);
@@ -94,15 +93,6 @@ public class ScanActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_upload).setOnClickListener(v -> pickImage.launch("image/*"));
         findViewById(R.id.btn_test).setOnClickListener(v -> processTestImage());
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void launchCamera() {
@@ -192,6 +182,7 @@ public class ScanActivity extends AppCompatActivity {
 
                 // 3. Assemble full Plant object — passes already-parsed JSON to avoid re-parsing
                 scannedPlant = new PlantFactory().createFromApi(plantJson, spriteBytes);
+                GameState.getPlayer().getGarden().add(scannedPlant);
                 Log.d(TAG, "Plant created: " + scannedPlant.getName());
 
                 Bitmap sprite = BitmapFactory.decodeByteArray(spriteBytes, 0, spriteBytes.length);

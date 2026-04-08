@@ -1,5 +1,7 @@
 package com.g4ng.service;
 
+import com.g4ng.ui.BuildConfig;
+
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -13,7 +15,7 @@ import java.util.Base64;
 
 public class AiSpriteGenerator {
 
-    private static final String API_KEY = com.g4ng.ui.BuildConfig.FLUX_API_KEY;
+    private static final String API_KEY = BuildConfig.FLUX_API_KEY;
     private static final String ENDPOINT = "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.2-klein-4b";
 
     public byte[] generateSprite(String plantName) throws Exception {
