@@ -7,6 +7,8 @@ public class Player {
     protected final List<Plant> garden;
     protected Plant currentPlant;
 
+    private int remainingHeals = 3;
+
     public Player(String username, List<Plant> garden) {
         this.username = username;
         this.garden = garden;
@@ -28,7 +30,20 @@ public class Player {
         return this.username;
     }
 
+    public int getRemainingHeals(){
+        return remainingHeals;
+    }
+
+    public void useHeal(){
+        remainingHeals--;
+    }
+
+    public void resetHeals(){
+        remainingHeals = 3;
+    }
+
     public void restoreGarden() {
+        resetHeals();
         for (Plant plant : garden) {
             plant.setCurrentHealth(plant.getMaxHealth());
         }

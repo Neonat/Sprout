@@ -4,25 +4,35 @@ import com.g4ng.model.Plant;
 import com.g4ng.model.Player;
 
 public class HealAction implements Action {
-    private final int healAmount;
 
-    public HealAction(int healAmount) {
-        this.healAmount = healAmount;
+    public HealAction() {
+    }
+
+    public static int calculateHealAmount(Plant plant) {
+        if (plant == null) return 0;
+        return (int) (plant.getMaxHealth() * 0.2) + 10;
     }
 
     @Override
-    public void execute(Player performer, Player opponent, Action opponentAction) {
+    public String execute(Player performer, Player opponent, Action opponentAction) {
+        if (performer.getRemainingHeals() <= 0) {
+            return performer.getUsername() + " has no more heals left!";
+        }
+
         Plant targetPlant = performer.getCurrentPlant();
         int oldHealth = targetPlant.getCurrentHealth();
+        int healAmount = calculateHealAmount(targetPlant);
+        
         targetPlant.setCurrentHealth(Math.min(targetPlant.getCurrentHealth() + healAmount, targetPlant.getMaxHealth()));
+        performer.useHeal();
+
         int actualHeal = targetPlant.getCurrentHealth() - oldHealth;
-        System.out.println(performer.getUsername() + "'s " + targetPlant.getName() + " healed " + actualHeal + " HP!");
+        return performer.getUsername() + "'s " + targetPlant.getName() + " healed " + actualHeal + " HP! (" + performer.getRemainingHeals() + " left)";
     }
 
     @Override
     public int getDefenseValue() {
-        // Healing might leave you vulnerable, or you could say it has a base defense.
-        // Let's go with 0 for now as it's not a defensive stance.
-        return 0;
+        // While healing, the plant prepares a defense. 
+        return 15;
     }
 }

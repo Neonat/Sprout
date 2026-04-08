@@ -1,34 +1,53 @@
 package com.g4ng.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.g4ng.logic.PlantFactory;
-import com.g4ng.ui.R;
-import com.g4ng.model.Player;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private Player currentPlayer;
-    private PlantFactory plantFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        currentPlayer = new Player("Bob", new ArrayList<>());
-        plantFactory = new PlantFactory();
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        View navGarden = findViewById(R.id.nav_garden);
+        View navAdventure = findViewById(R.id.nav_adventure);
+        View navCamera = findViewById(R.id.nav_camera);
+
+        pressAnim(navGarden);
+        pressAnim(navAdventure);
+        pressAnim(navCamera);
+
+        navGarden.setOnClickListener(v ->
+                startActivity(new Intent(this, GardenActivity.class)));
+
+        navAdventure.setOnClickListener(v ->
+                startActivity(new Intent(this, BattleActivity.class)));
+
+        navCamera.setOnClickListener(v ->
+                startActivity(new Intent(this, ScanActivity.class)));
+    }
+
+    static void pressAnim(View v) {
+        v.setOnTouchListener((view, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    view.animate().scaleX(0.90f).scaleY(0.90f).setDuration(80).start();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    view.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                    break;
+            }
+            return false;
         });
     }
 }
