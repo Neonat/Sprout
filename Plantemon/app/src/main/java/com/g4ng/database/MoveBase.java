@@ -29,8 +29,8 @@ public class MoveBase extends Base<Integer, Move> {
         String name = data.optString("name", "Unknown Move");
         int attack = data.optInt("attack", 0);
         int defense = data.optInt("defense", 0);
-        int accuracy = data.optInt("accuracy", 0);
-        int power = data.optInt("power", 0);
+        int accuracy = data.optInt("accuracy", 100);
+        int power = data.optInt("power", 100);
         var model = new Move(name, attack, defense, accuracy, power);
         this.data.put(id, model);
     }
