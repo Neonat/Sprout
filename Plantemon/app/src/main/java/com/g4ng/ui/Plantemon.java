@@ -13,16 +13,17 @@ public class Plantemon extends Application {
     public void onCreate() {
         super.onCreate();
         // Initialize the singleton classes
+        // In theory, quite easy to switch these to use an API result
         var moveBase = MoveBase.getInstance();
         var taxonomyMoveMapBase = TaxonomyMoveMapBase.getInstance();
-        try (var is = getAssets().open("moves.json")) {
+        try (var is = getResources().openRawResource(R.raw.moves)) {
             moveBase.read(is);
         }
         catch (IOException e) {
             Log.e("Plantemon", "Failed to read moves.json", e);
         }
 
-        try (var is = getAssets().open("taxonomy.json")) {
+        try (var is = getResources().openRawResource(R.raw.taxonomy)) {
             taxonomyMoveMapBase.read(is);
         }
         catch (IOException e) {
