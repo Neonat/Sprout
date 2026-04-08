@@ -10,8 +10,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.g4ng.logic.Action;
+import com.g4ng.logic.BattleHandler;
+import com.g4ng.logic.BotController;
 import com.g4ng.logic.HealAction;
-import com.g4ng.logic.LocalBattleHandler;
+import com.g4ng.logic.HumanController;
 import com.g4ng.logic.Move;
 import com.g4ng.model.BattleState;
 import com.g4ng.model.Plant;
@@ -25,7 +27,7 @@ public class BattleActivity extends AppCompatActivity {
 
     private Player player;
     private Player opponent;
-    private LocalBattleHandler battleHandler;
+    private BattleHandler battleHandler;
 
     private TextView tvPlayerUsername, tvPlayerPlantName, tvPlayerHp;
     private TextView tvOpponentUsername, tvOpponentPlantName, tvOpponentHp;
@@ -71,31 +73,17 @@ public class BattleActivity extends AppCompatActivity {
 
     private void setupBattle() {
         // Player setup
-        List<Plant> playerGarden = new ArrayList<>();
-        playerGarden.add(new Plant("Bulbasaur", 100, null));
-        playerGarden.add(new Plant("Oddish", 100, null));
-        player = new Player("Ash", playerGarden);
+        player = GameState.getPlayer();
 
         // Bot setup
         List<Plant> opponentGarden = new ArrayList<>();
-        opponentGarden.add(new Plant("Caterpie", 40, null));
+        Random r =new Random();
+        Plant opponentPlant = player.getGarden().get(r.nextInt(player.getGarden().size()));
+        opponentGarden.add(opponentPlant);
         opponent = new Player("Gary (BOT)", opponentGarden);
+        player.setCurrentPlant(player.getGarden().get(r.nextInt(player.getGarden().size())));
 
-        Random random = new Random();
-        player.setCurrentPlant(playerGarden.get(random.nextInt(playerGarden.size())));
-        opponent.setCurrentPlant(opponentGarden.get(0));
-
-        // Add moves to player
-        Plant p = player.getCurrentPlant();
-        p.addMove(new Move("Tackle", 20, 10, 100, 0));
-        p.addMove(new Move("Vine Whip", 25, 5, 90, 0));
-        p.addMove(new Move("Razor Leaf", 35, 0, 80, 0));
-        p.addMove(new Move("Sleep Powder", 0, 0, 75, 0));
-
-        // Add moves to bot
-        opponent.getCurrentPlant().addMove(new Move("Tackle", 15, 5, 100, 0));
-
-        battleHandler = new LocalBattleHandler(player, opponent);
+        battleHandler = new BattleHandler(player, opponent,new HumanController(),new BotController());
         setupMoveButtons();
     }
 

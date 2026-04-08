@@ -10,27 +10,31 @@ import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BattleHandler {
+public class BattleHandler {
     private static final String TAG = "BattleHandler";
-    protected Player player1;
-    protected Player player2;
-    protected Action p1SelectedAction;
-    protected Action p2SelectedAction;
-    protected BattleState state;
-    
-    protected List<String> turnResults = new ArrayList<>();
 
-    protected BattleHandler(Player player1, Player player2) {
+    private Player player1;
+    private Player player2;
+
+    // The Strategies
+    private BattleController p1Controller;
+    private BattleController p2Controller;
+
+    private Action p1SelectedAction;
+    private Action p2SelectedAction;
+    private BattleState state;
+    protected List<String> turnResults = new ArrayList<>();
+    public BattleHandler(Player player1, Player player2, BattleController p1Controller, BattleController p2Controller) {
         this.player1 = Objects.requireNonNull(player1);
         this.player2 = Objects.requireNonNull(player2);
+        this.p1Controller = Objects.requireNonNull(p1Controller);
+        this.p2Controller = Objects.requireNonNull(p2Controller);
         this.state = BattleState.P1_MOVE;
-        
+
         Log.d(TAG, "Battle started: " + player1.getUsername() + " vs " + player2.getUsername());
+        advanceState();
     }
 
-    public List<String> getLatestTurnResults() {
-        return turnResults;
-    }
     public void applyAction(Player player, Action action) {
         if (player == player1) {
             p1SelectedAction = action;
@@ -51,22 +55,35 @@ public abstract class BattleHandler {
 
         switch (state) {
             case P1_MOVE:
-                if (p1SelectedAction != null) {
+                if (p1SelectedAction == null) {
+                    // Ask P1's controller for a move
+                    p1Controller.requestAction(this, player1);
+                } else {
                     state = BattleState.P2_MOVE;
+                    advanceState();
                 }
                 break;
+
             case P2_MOVE:
-                if (p2SelectedAction != null) {
+                if (p2SelectedAction == null) {
+                    // Ask P2's controller for a move
+                    p2Controller.requestAction(this, player2);
+                } else {
                     state = BattleState.PROCESSING;
-                    processTurn();
+                    advanceState();
                 }
                 break;
+
             case PROCESSING:
+                processTurn();
                 resetRound();
                 state = BattleState.P1_MOVE;
+                advanceState(); // Loop back to P1
                 break;
         }
-        botCheck();
+    }
+    public List<String> getLatestTurnResults() {
+        return turnResults;
     }
 
     public void processTurn() {
@@ -86,9 +103,13 @@ public abstract class BattleHandler {
         advanceState();
     }
 
-    public abstract void updatePlayers();
-
-    protected abstract void botCheck();
+    public void updatePlayers(){
+        System.out.println("Status Update:");
+        System.out.println(player1.getUsername() + "'s " + player1.getCurrentPlant().getName() +
+                ": " + player1.getCurrentPlant().getCurrentHealth() + " HP");
+        System.out.println(player2.getUsername() + "'s " + player2.getCurrentPlant().getName() +
+                ": " + player2.getCurrentPlant().getCurrentHealth() + " HP");
+    }
 
     protected void executeSequence(Action firstAction, Action secondAction, Player firstPlayer, Player secondPlayer) {
         Action firstPlayerAction = (firstPlayer == player1) ? p1SelectedAction : p2SelectedAction;
@@ -100,12 +121,12 @@ public abstract class BattleHandler {
 
         if (secondPlayer.getCurrentPlant().isDead()) {
             turnResults.add(secondPlayer.getUsername() + "'s " + secondPlayer.getCurrentPlant().getName() + " fainted!");
-            return; 
+            return;
         }
 
         if (secondAction != null && !firstPlayer.getCurrentPlant().isDead()) {
             turnResults.add(secondAction.execute(secondPlayer, firstPlayer, firstPlayerAction));
-            
+
             if (firstPlayer.getCurrentPlant().isDead()) {
                 turnResults.add(firstPlayer.getUsername() + "'s " + firstPlayer.getCurrentPlant().getName() + " fainted!");
             }
@@ -130,14 +151,9 @@ public abstract class BattleHandler {
         p1SelectedAction = null;
         p2SelectedAction = null;
     }
-    public boolean hasAvailablePlants(Player player) {
-        for (Plant plant : player.getGarden()){
-        if (!plant.isDead()) {
-            return true;
-        }}
-        return false;
-    }
+
     public BattleState getState() {
         return state;
     }
 }
+
