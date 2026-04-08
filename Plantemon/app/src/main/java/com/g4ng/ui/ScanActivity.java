@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -180,12 +179,15 @@ public class ScanActivity extends AppCompatActivity {
                 AiSpriteGenerator spriteGen = new AiSpriteGenerator();
                 byte[] spriteBytes = spriteGen.generateSprite(plantName);
 
+                // Save sprite to file
+                String spritePath = saveSpriteToFile(plantName, spriteBytes);
+
                 // 3. Assemble full Plant object — passes already-parsed JSON to avoid re-parsing
-                scannedPlant = new PlantFactory().createFromApi(plantJson, spriteBytes);
+                scannedPlant = new PlantFactory().createFromApi(plantJson, spritePath);
                 GameState.getPlayer().getGarden().add(scannedPlant);
                 Log.d(TAG, "Plant created: " + scannedPlant.getName());
 
-                Bitmap sprite = BitmapFactory.decodeByteArray(spriteBytes, 0, spriteBytes.length);
+                Bitmap sprite = BitmapFactory.decodeFile(spritePath);
 
                 runOnUiThread(() -> {
                     ivSprite.setImageBitmap(sprite);
@@ -206,5 +208,18 @@ public class ScanActivity extends AppCompatActivity {
                 isProcessing.set(false);
             }
         }).start();
+    }
+
+    private String saveSpriteToFile(String plantName, byte[] spriteBytes) throws IOException {
+        String fileName = "SPRITE_" + plantName.replaceAll("\\s+", "_") + "_" + System.currentTimeMillis() + ".png";
+        File storageDir = getExternalFilesDir("Sprites");
+        if (storageDir != null && !storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+        File spriteFile = new File(storageDir, fileName);
+        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(spriteFile)) {
+            fos.write(spriteBytes);
+        }
+        return spriteFile.getAbsolutePath();
     }
 }
