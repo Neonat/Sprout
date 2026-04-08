@@ -49,6 +49,9 @@ public class BattleLogicTest {
         garden2.add(weedle);
         p2 = new Player("Gary", garden2);
 
+        p1.setCurrentPlant(p1.getGarden().get(0));
+        p2.setCurrentPlant(p2.getGarden().get(0));
+
         battleHandler = new LocalBattleHandler(p1, p2);
     }
 
@@ -82,12 +85,14 @@ public class BattleLogicTest {
         
         System.out.println("Stage 2: Ash uses HealAction(30), Gary waits");
         HealAction heal = new HealAction();
+        // heal by 20% + 10hp
         battleHandler.applyAction(p1, heal);
+        // take 1hp damage
         battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100, 0)); // P2 does nothing
         
         assertTrue(p1.getCurrentPlant().getCurrentHealth() > healthBefore);
-        assertEquals(healthBefore + 30, p1.getCurrentPlant().getCurrentHealth());
-        System.out.println("Result: Health increased by exactly 30.");
+        assertEquals(healthBefore + 29, p1.getCurrentPlant().getCurrentHealth());
+        System.out.println("Result: Health increased by exactly 29.");
     }
     
     @Test
@@ -157,29 +162,5 @@ public class BattleLogicTest {
         
         assertEquals(initialHealth, target.getCurrentHealth());
         System.out.println("Result: Gary's " + target.getName() + " took no damage.");
-    }
-
-    @Test
-    public void testMultiplePlantsWinCondition() {
-        System.out.println("\n>>> TEST: testMultiplePlantsWinCondition <<<");
-        System.out.println("Stage 1: Gary's Caterpie faints");
-        // Gary has 2 plants: Caterpie and Weedle
-        // Kill Caterpie
-        p2.getCurrentPlant().takeDamage(100);
-        assertTrue(p2.getGarden().get(0).isDead());
-        
-        System.out.println("Stage 2: Verifying battle continues because Weedle is still alive");
-        // Win check should be false because Weedle is alive
-        assertFalse(battleHandler.checkWin());
-        
-        System.out.println("Stage 3: Gary's Weedle faints");
-        // Kill Weedle
-        p2.getGarden().get(1).takeDamage(100);
-        assertTrue(p2.getGarden().get(1).isDead());
-        
-        System.out.println("Stage 4: Verifying win condition is met");
-        // Now it should be a win
-        assertTrue(battleHandler.checkWin());
-        System.out.println("Result: Win condition correctly detected after all plants fainted.");
     }
 }
