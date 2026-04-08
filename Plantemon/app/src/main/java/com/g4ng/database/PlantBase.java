@@ -3,7 +3,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,19 +28,16 @@ public class PlantBase extends Base<String, PlantInit>{
         ArrayList<Integer> moveIds = new ArrayList<>();
 
         int length = 0;
-        if (moveIdsRaw == null || moveIdsRaw.length() == 0) {
-            // first four moveIds are for generic moves that can apply to any plant
-            // basically the normal type
-            moveIds.add(0);
-            moveIds.add(1);
-            moveIds.add(2);
-            moveIds.add(3);
-        }
-        else {
+        if (moveIdsRaw != null) {
             length = moveIdsRaw.length();
         }
-        for (int i = 0; i < length; i++) {
-            moveIds.add(moveIdsRaw.getInt(i));
+        for (int i = 0; i < 4; i++) {
+            moveIds.add(i);
+        }
+        if (length != 0) {
+            for (int i = 0; i < length; i++) {
+                moveIds.add(moveIdsRaw.getInt(i));
+            }
         }
         var model = new PlantInit(id, moveIds);
         this.data.put(id, model);
