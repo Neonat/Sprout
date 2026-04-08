@@ -81,7 +81,7 @@ public class BattleLogicTest {
         int healthBefore = p1.getCurrentPlant().getCurrentHealth();
         
         System.out.println("Stage 2: Ash uses HealAction(30), Gary waits");
-        HealAction heal = new HealAction(30);
+        HealAction heal = new HealAction();
         battleHandler.applyAction(p1, heal);
         battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100, 0)); // P2 does nothing
         
