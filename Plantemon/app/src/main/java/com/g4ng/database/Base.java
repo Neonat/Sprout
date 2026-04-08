@@ -13,6 +13,9 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public abstract class Base<K, V> {
+    // this is not efficient: as the amount of predefined data grows this will take up more memory
+    // ideally we should have the ability to use this class in a try-with
+    // and should not fetch all the data - SQL would have been better but this is faster to work with
     protected HashMap<K, V> data;
     public HashMap<K, V> getData() {
         return data;
