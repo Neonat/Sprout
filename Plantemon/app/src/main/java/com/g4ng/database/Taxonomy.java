@@ -10,6 +10,14 @@ public class Taxonomy {
     public final String phylum;
 
     public Taxonomy(JSONObject data) {
+        if (data == null) {
+            class_ = "Unknown";
+            genus = "Unknown";
+            order = "Unknown";
+            family = "Unknown";
+            phylum = "Unknown";
+            return;
+        }
         class_ = data.optString("class");
         genus = data.optString("genus");
         order = data.optString("order");

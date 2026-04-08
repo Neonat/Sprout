@@ -1,7 +1,8 @@
 package com.g4ng.logic;
 
 import com.g4ng.database.MoveBase;
-import com.g4ng.database.PlantBase;
+import com.g4ng.database.Taxonomy;
+import com.g4ng.database.TaxonomyMoveMapBase;
 import com.g4ng.model.Plant;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -9,8 +10,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import android.util.Log;
 
 public class PlantFactory {
 
@@ -47,23 +46,10 @@ public class PlantFactory {
 
         // NOTE: Both bases assumed to be initialized already
         // i.e. .read(InputStream) has already been called for both of them
-        var plantBase = PlantBase.getInstance().getData();
+        var taxonomyBase = TaxonomyMoveMapBase.getInstance();
         var moveBase = MoveBase.getInstance().getData();
-        String plantId = plant.getId().toString();
-        if (!plantBase.containsKey(plantId)) {
-            for (int i = 0; i < 4; i++) {
-                plant.addMove(moveBase.get(i));
-            }
-            return plant;
-        }
 
-        var plantActionMap = plantBase.get(plantId);
-        // Handling the extremely unlikely event of the item being null despite existing
-        if (plantActionMap == null) {
-            Log.e("PlantFactory", "PlantBase contains null value for key " + plantId + " - check plant.json");
-            throw new RuntimeException("PlantBase contains null value for key " + plantId);
-        }
-        var moveIds = plantActionMap.moveIds;
+        var moveIds = taxonomyBase.getMoves(new Taxonomy(taxonomy));
         ArrayList<Integer> moveIdsCopy = new ArrayList<>(moveIds);
         Collections.shuffle(moveIdsCopy);
         for (int i = 0; i < 4; i++) {
