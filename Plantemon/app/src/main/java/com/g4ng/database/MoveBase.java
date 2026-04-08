@@ -1,17 +1,10 @@
 package com.g4ng.database;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.util.HashMap;
 
-import android.content.Context;
-import android.util.Log;
 import com.g4ng.logic.Move;
-import com.g4ng.ui.R;
 
 // Singleton class to load JSON data and turn it into a hash map
 // JSON will contain an array of objects
@@ -20,19 +13,18 @@ import com.g4ng.ui.R;
 //    id: 19i,
 //    name: "Thunderbolt",
 //    attack: 10,
-//    defence: -3
+//    defense: -3
 //}
 public class MoveBase extends Base<Integer, Move> {
     private static MoveBase instance;
 
-    private MoveBase(Context context) {
+    private MoveBase() {
         // Read data from move.json, get JSON object
         data = new HashMap<>();
-        read(context, R.raw.moves);
     }
 
     @Override
-    protected void insert(JSONObject data) throws IOException {
+    protected void insert(JSONObject data) {
         Integer id = data.optInt("id", 0);
         String name = data.optString("name", "Unknown Move");
         int attack = data.optInt("attack", 0);
@@ -43,9 +35,9 @@ public class MoveBase extends Base<Integer, Move> {
         this.data.put(id, model);
     }
 
-    public static MoveBase getInstance(Context context) {
+    public static MoveBase getInstance() {
         if (instance == null) {
-            return new MoveBase(context.getApplicationContext());
+            instance = new MoveBase();
         }
         return instance;
     }
