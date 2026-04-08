@@ -6,13 +6,22 @@
     android:background="#000000"
     android:paddingTop="24dp">
 
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="← Back"
+        style="?android:attr/borderlessButtonStyle"
+        android:textColor="#BBBBBB"
+        android:textSize="15sp"
+        android:layout_marginStart="4dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#2e7d32"
         android:orientation="horizontal"
-        android:padding="12dp"
-        android:layout_marginTop="16dp">
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/imageViewOpponentSprite"
