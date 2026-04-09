@@ -15,10 +15,10 @@ import java.util.List;
 
 public class PlantFactory {
 
-    private final String TAG = "PlantFactory";
+    private static final String TAG = "PlantFactory";
 
     /** Assembles a Plant from an already-parsed API response and a generated sprite. */
-    public Plant createFromApi(JSONObject data, String spritePath) {
+    public static Plant createFromApi(JSONObject data, String spritePath) {
         if (data.has("error")) return null;
 
         String name = data.optString("name", "Unknown Plant");
@@ -61,7 +61,16 @@ public class PlantFactory {
         return plant;
     }
 
-    public Plant createFromScan(JSONObject data, String spritePath) {
+    public static Plant createFromScan(JSONObject data, String spritePath) {
         return createFromApi(data, spritePath);
+    }
+
+    public static Plant createFromSaved(JSONObject data) {
+        // get name, speed, spritePath
+        String name = data.optString("name");
+        int speed = data.optInt("speed");
+        String spritePath = data.optString("spritePath");
+        // moves to be handled in PlantJsonHandler - not good practice but works for now
+        return new Plant(name, speed, spritePath);
     }
 }
