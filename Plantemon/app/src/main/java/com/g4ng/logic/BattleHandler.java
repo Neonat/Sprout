@@ -55,30 +55,34 @@ public class BattleHandler {
 
         switch (state) {
             case P1_MOVE:
+                Log.i(TAG, "advanceState: Waiting for P1");
                 if (p1SelectedAction == null) {
                     // Ask P1's controller for a move
                     p1Controller.requestAction(this, player1);
                 } else {
+                    Log.i(TAG, "advanceState: P1 Moved");
                     state = BattleState.P2_MOVE;
-                    advanceState();
                 }
                 break;
 
             case P2_MOVE:
+                Log.i(TAG, "advanceState: Waiting for P2");
                 if (p2SelectedAction == null) {
                     // Ask P2's controller for a move
                     p2Controller.requestAction(this, player2);
                 } else {
+                    Log.i(TAG, "advanceState: P2 Moved");
                     state = BattleState.PROCESSING;
                     advanceState();
                 }
                 break;
 
             case PROCESSING:
+                Log.i(TAG, "advanceState: Processing turn");
                 processTurn();
                 resetRound();
                 state = BattleState.P1_MOVE;
-                advanceState(); // Loop back to P1
+                advanceState();
                 break;
         }
     }
@@ -100,7 +104,6 @@ public class BattleHandler {
         }
 
         updatePlayers();
-        advanceState();
     }
 
     public void updatePlayers(){
