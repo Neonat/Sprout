@@ -183,7 +183,7 @@ public class ScanActivity extends AppCompatActivity {
                 String spritePath = saveSpriteToFile(plantName, spriteBytes);
 
                 // 3. Assemble full Plant object — passes already-parsed JSON to avoid re-parsing
-                scannedPlant = new PlantFactory().createFromApi(plantJson, spritePath);
+                scannedPlant = PlantFactory.createFromApi(plantJson, spritePath);
                 GameState.getPlayer().getGarden().add(scannedPlant);
                 Log.d(TAG, "Plant created: " + scannedPlant.getName());
 
