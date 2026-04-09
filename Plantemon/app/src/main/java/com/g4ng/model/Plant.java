@@ -2,18 +2,21 @@ package com.g4ng.model;
 
 import com.g4ng.logic.Move;
 
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class Plant {
+public class Plant implements Serializable {
     private final UUID id;
     private final String name;
-    private int maxHealth;
+    private final int maxHealth;
     private int currentHealth;
     private int speed;
-    private List<Move> moves;
-    private byte[] sprite;
+    private final List<Move> moves;
+    private final String spritePath;
+    private Date scanDateTime;
 
     // New metadata fields from API
     private List<String> commonNames;
@@ -26,14 +29,15 @@ public class Plant {
     private String toxicity;
     private String bestWatering;
 
-    public Plant(String name, int speed, byte[] sprite) {
+    public Plant(String name, int speed, String spritePath) {
         this.id = UUID.randomUUID();
         this.name = name;
         this.maxHealth = 100;
         this.currentHealth = maxHealth;
         this.speed = speed;
-        this.sprite = sprite;
+        this.spritePath = spritePath;
         this.moves = new ArrayList<>();
+        this.scanDateTime = new Date(); // Default to now
     }
 
     // Setters
@@ -47,6 +51,7 @@ public class Plant {
     public void setCulturalSignificance(String culturalSignificance) { this.culturalSignificance = culturalSignificance; }
     public void setToxicity(String toxicity) { this.toxicity = toxicity; }
     public void setBestWatering(String bestWatering) { this.bestWatering = bestWatering; }
+    public void setScanDateTime(Date scanDateTime) { this.scanDateTime = scanDateTime; }
 
     // Getters
     public UUID getId() { return id; }
@@ -72,8 +77,9 @@ public class Plant {
     public String getCulturalSignificance() { return culturalSignificance; }
     public String getToxicity() { return toxicity; }
     public String getBestWatering() { return bestWatering; }
+    public Date getScanDateTime() { return scanDateTime; }
 
-    public byte[] getSprite() { return sprite; }
+    public String getSpritePath() { return spritePath; }
 
     public void addMove(Move move) { this.moves.add(move); }
     public void deleteMove(Move move) { this.moves.remove(move); }

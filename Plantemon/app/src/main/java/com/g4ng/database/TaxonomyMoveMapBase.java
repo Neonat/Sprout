@@ -1,5 +1,7 @@
 package com.g4ng.database;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,6 +15,7 @@ import java.util.List;
 // Future: map based on region and seasons
 public class TaxonomyMoveMapBase extends Base<Integer, List<Integer>> {
     private static TaxonomyMoveMapBase instance;
+    private final String TAG = "TaxonomyMoveMapBase";
     private final String VASCULAR = "Tracheophyta";
     private final String[] FERNS = {"Polypodiopsida", "Lycopodiopsida", "Equisetopsida"};
     private final String[] CONIFERS = {"Pinopsida", "Cycadopsida", "Ginkgoopsida", "Gnetopsida"};
@@ -42,24 +45,32 @@ public class TaxonomyMoveMapBase extends Base<Integer, List<Integer>> {
                 moveIds.add(moveIdsRaw.getInt(i));
             }
         }
+        Log.i(TAG, "insert: " + id + moveIds.toString());
         this.data.put(id, moveIds);
     }
 
     // decision tree to look up moves in the map based on taxonomy
     public List<Integer> getMoves(Taxonomy taxonomy) {
+        if (taxonomy == null) {
+            throw new RuntimeException("Taxonomy cannot be null");
+        }
         // Non-vascular plants -> moss
         if (!taxonomy.phylum.equals(VASCULAR)) {
+            Log.i(TAG, "Non-vascular plant");
             return data.get(0);
         }
         // ferns
         if (fernSet.contains(taxonomy.class_)) {
+            Log.i(TAG, "Ferns");
             return data.get(1);
         }
         // gymnosperms -> conifer trees
         if (coniferSet.contains(taxonomy.class_)) {
+            Log.i(TAG, "Gymnosperms");
             return data.get(2);
         }
         // angiosperms - flowering plants
+        Log.i(TAG, "Angiosperms");
         return data.get(3);
     }
 }

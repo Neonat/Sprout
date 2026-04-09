@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
+        android:name=".Plantemon"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -28,6 +29,7 @@
         <activity android:name="com.g4ng.ui.ScanActivity" />
         <activity android:name="com.g4ng.ui.BattleActivity" />
         <activity android:name="com.g4ng.ui.GardenActivity" />
+        <activity android:name="com.g4ng.ui.InfoActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
