@@ -1,17 +1,22 @@
 package com.g4ng.ui;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.g4ng.logic.Action;
+import com.g4ng.logic.BattleHandler;
+import com.g4ng.logic.BotController;
 import com.g4ng.logic.HealAction;
-import com.g4ng.logic.LocalBattleHandler;
+import com.g4ng.logic.HumanController;
 import com.g4ng.logic.Move;
 import com.g4ng.model.BattleState;
 import com.g4ng.model.Plant;
@@ -25,12 +30,14 @@ public class BattleActivity extends AppCompatActivity {
 
     private Player player;
     private Player opponent;
-    private LocalBattleHandler battleHandler;
+    private BattleHandler battleHandler;
 
     private TextView tvPlayerUsername, tvPlayerPlantName, tvPlayerHp;
     private TextView tvOpponentUsername, tvOpponentPlantName, tvOpponentHp;
     private TextView tvBattleLog;
     private Button btnMove1, btnMove2, btnMove3, btnMove4, btnSpecial;
+
+    private ImageView imageViewPlayerSprite, imageViewOpponentSprite;
 
     private boolean showingSpecial = false;
 
@@ -50,7 +57,8 @@ public class BattleActivity extends AppCompatActivity {
         tvPlayerUsername = findViewById(R.id.textViewPlayerUsername);
         tvPlayerPlantName = findViewById(R.id.textViewPlayerPlantName);
         tvPlayerHp = findViewById(R.id.textViewPlayerHp);
-        
+        imageViewPlayerSprite = findViewById(R.id.imageViewPlayerSprite);
+        imageViewOpponentSprite = findViewById(R.id.imageViewOpponentSprite);
         tvOpponentUsername = findViewById(R.id.textViewOpponentUsername);
         tvOpponentPlantName = findViewById(R.id.textViewOpponentPlantName);
         tvOpponentHp = findViewById(R.id.textViewOpponentHp);
@@ -71,34 +79,29 @@ public class BattleActivity extends AppCompatActivity {
 
     private void setupBattle() {
         // Player setup
-        List<Plant> playerGarden = new ArrayList<>();
-        playerGarden.add(new Plant("Bulbasaur", 100, null));
-        playerGarden.add(new Plant("Oddish", 100, null));
-        player = new Player("Ash", playerGarden);
+        player = GameState.getPlayer();
 
         // Bot setup
         List<Plant> opponentGarden = new ArrayList<>();
-        opponentGarden.add(new Plant("Caterpie", 40, null));
+        Random r =new Random();
+        opponentGarden = new ArrayList<>();
+        for(Plant plant : player.getGarden()){
+           opponentGarden.add(new Plant(plant));
+        }
         opponent = new Player("Gary (BOT)", opponentGarden);
-
-        Random random = new Random();
-        player.setCurrentPlant(playerGarden.get(random.nextInt(playerGarden.size())));
-        opponent.setCurrentPlant(opponentGarden.get(0));
-
-        // Add moves to player
-        Plant p = player.getCurrentPlant();
-        p.addMove(new Move("Tackle", 20, 10, 100, 0));
-        p.addMove(new Move("Vine Whip", 25, 5, 90, 0));
-        p.addMove(new Move("Razor Leaf", 35, 0, 80, 0));
-        p.addMove(new Move("Sleep Powder", 0, 0, 75, 0));
-
-        // Add moves to bot
-        opponent.getCurrentPlant().addMove(new Move("Tackle", 15, 5, 100, 0));
-
-        battleHandler = new LocalBattleHandler(player, opponent);
+        player.setCurrentPlant(player.getGarden().get(r.nextInt(player.getGarden().size())));
+        opponent.setCurrentPlant(opponent.getGarden().get(r.nextInt(opponent.getGarden().size())));
+        battleHandler = new BattleHandler(player, opponent,new HumanController(),new BotController());
         setupMoveButtons();
+        setupPlantemonImages();
     }
 
+    private void setupPlantemonImages(){
+        Bitmap bitmap = BitmapFactory.decodeFile(player.getCurrentPlant().getSpritePath());
+        imageViewPlayerSprite.setImageBitmap(bitmap);
+        bitmap = BitmapFactory.decodeFile(opponent.getCurrentPlant().getSpritePath());
+        imageViewOpponentSprite.setImageBitmap(bitmap);
+    }
     private void setupMoveButtons() {
         List<Move> moves = player.getCurrentPlant().getMoves();
         setButtonAction(btnMove1, moves.size() > 0 ? moves.get(0) : null);

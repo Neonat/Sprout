@@ -39,6 +39,37 @@ public class Plant implements Serializable {
         this.moves = new ArrayList<>();
         this.scanDateTime = new Date(); // Default to now
     }
+    /**
+     * Copy constructor for deep copying a Plant object.
+     */
+    public Plant(Plant other) {
+        this.id = other.id;
+        this.name = other.name;
+        this.spritePath = other.spritePath;
+
+        this.maxHealth = other.maxHealth;
+        this.currentHealth = other.currentHealth;
+        this.speed = other.speed;
+
+        this.moves = other.moves;
+
+        if (other.scanDateTime != null) {
+            this.scanDateTime = new Date(other.scanDateTime.getTime());
+        }
+        if (other.commonNames != null) {
+            this.commonNames = new ArrayList<>(other.commonNames);
+        } else {
+            this.commonNames = null;
+        }
+        this.description = other.description;
+        this.taxonomy = other.taxonomy;
+        this.bestLightCondition = other.bestLightCondition;
+        this.bestSoilType = other.bestSoilType;
+        this.commonUses = other.commonUses;
+        this.culturalSignificance = other.culturalSignificance;
+        this.toxicity = other.toxicity;
+        this.bestWatering = other.bestWatering;
+    }
 
     // Setters
     public void setSpeed(int speed) { this.speed = speed; }
