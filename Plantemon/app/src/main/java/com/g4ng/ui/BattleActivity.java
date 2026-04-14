@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ public class BattleActivity extends AppCompatActivity {
 
     private TextView tvPlayerUsername, tvPlayerPlantName, tvPlayerHp;
     private TextView tvOpponentUsername, tvOpponentPlantName, tvOpponentHp;
+    private ProgressBar hpBarPlayer, hpBarOpponent;
     private TextView tvBattleLog;
     private Button btnMove1, btnMove2, btnMove3, btnMove4, btnSpecial;
 
@@ -57,11 +59,15 @@ public class BattleActivity extends AppCompatActivity {
         tvPlayerUsername = findViewById(R.id.textViewPlayerUsername);
         tvPlayerPlantName = findViewById(R.id.textViewPlayerPlantName);
         tvPlayerHp = findViewById(R.id.textViewPlayerHp);
-        imageViewPlayerSprite = findViewById(R.id.imageViewPlayerSprite);
-        imageViewOpponentSprite = findViewById(R.id.imageViewOpponentSprite);
+        hpBarPlayer = findViewById(R.id.hpBarPlayer);
+
         tvOpponentUsername = findViewById(R.id.textViewOpponentUsername);
         tvOpponentPlantName = findViewById(R.id.textViewOpponentPlantName);
         tvOpponentHp = findViewById(R.id.textViewOpponentHp);
+        hpBarOpponent = findViewById(R.id.hpBarOpponent);
+
+        imageViewPlayerSprite = findViewById(R.id.imageViewPlayerSprite);
+        imageViewOpponentSprite = findViewById(R.id.imageViewOpponentSprite);
         
         tvBattleLog = findViewById(R.id.textViewBattleLog);
 
@@ -83,26 +89,37 @@ public class BattleActivity extends AppCompatActivity {
 
         // Bot setup
         List<Plant> opponentGarden = new ArrayList<>();
-        Random r =new Random();
-        opponentGarden = new ArrayList<>();
-        for(Plant plant : player.getGarden()){
-           opponentGarden.add(new Plant(plant));
+        Random r = new Random();
+        for (Plant plant : player.getGarden()) {
+            opponentGarden.add(new Plant(plant));
         }
         opponent = new Player("Gary (BOT)", opponentGarden);
-        player.setCurrentPlant(player.getGarden().get(r.nextInt(player.getGarden().size())));
-        opponent.setCurrentPlant(opponent.getGarden().get(r.nextInt(opponent.getGarden().size())));
-        battleHandler = new BattleHandler(player, opponent,new HumanController(),new BotController());
+        
+        if (!player.getGarden().isEmpty()) {
+            player.setCurrentPlant(player.getGarden().get(r.nextInt(player.getGarden().size())));
+        }
+        if (!opponent.getGarden().isEmpty()) {
+            opponent.setCurrentPlant(opponent.getGarden().get(r.nextInt(opponent.getGarden().size())));
+        }
+        
+        battleHandler = new BattleHandler(player, opponent, new HumanController(), new BotController());
         setupMoveButtons();
         setupPlantemonImages();
     }
 
-    private void setupPlantemonImages(){
-        Bitmap bitmap = BitmapFactory.decodeFile(player.getCurrentPlant().getSpritePath());
-        imageViewPlayerSprite.setImageBitmap(bitmap);
-        bitmap = BitmapFactory.decodeFile(opponent.getCurrentPlant().getSpritePath());
-        imageViewOpponentSprite.setImageBitmap(bitmap);
+    private void setupPlantemonImages() {
+        if (player.getCurrentPlant() != null && player.getCurrentPlant().getSpritePath() != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(player.getCurrentPlant().getSpritePath());
+            if (bitmap != null) imageViewPlayerSprite.setImageBitmap(bitmap);
+        }
+        if (opponent.getCurrentPlant() != null && opponent.getCurrentPlant().getSpritePath() != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(opponent.getCurrentPlant().getSpritePath());
+            if (bitmap != null) imageViewOpponentSprite.setImageBitmap(bitmap);
+        }
     }
+
     private void setupMoveButtons() {
+        if (player.getCurrentPlant() == null) return;
         List<Move> moves = player.getCurrentPlant().getMoves();
         setButtonAction(btnMove1, moves.size() > 0 ? moves.get(0) : null);
         setButtonAction(btnMove2, moves.size() > 1 ? moves.get(1) : null);
@@ -132,13 +149,12 @@ public class BattleActivity extends AppCompatActivity {
             btnMove3.setVisibility(View.VISIBLE);
             btnMove4.setVisibility(View.VISIBLE);
             setupMoveButtons();
-            // Ensure they are enabled if it's player's turn
             setButtonsEnabled(battleHandler.getState() == BattleState.P1_MOVE);
         }
     }
 
     private void updateSpecialMenuButtons() {
-        if (showingSpecial) {
+        if (showingSpecial && player.getCurrentPlant() != null) {
             int healAmount = HealAction.calculateHealAmount(player.getCurrentPlant());
             int remaining = player.getRemainingHeals();
             btnMove1.setText("Heal (" + healAmount + " HP) x " + remaining);
@@ -194,7 +210,7 @@ public class BattleActivity extends AppCompatActivity {
         if (enabled) {
             if (showingSpecial) {
                 btnMove1.setEnabled(player.getRemainingHeals() > 0);
-                btnMove2.setEnabled(false); // Always disabled in special menu
+                btnMove2.setEnabled(false); 
                 btnMove3.setEnabled(false);
                 btnMove4.setEnabled(false);
             } else {
@@ -212,30 +228,40 @@ public class BattleActivity extends AppCompatActivity {
     }
 
     private Action selectBotAction() {
-        // BOT HEAL LOGIC: If health < 40% and has heals left, heal!
         Plant p = opponent.getCurrentPlant();
-        if (p.getCurrentHealth() < p.getMaxHealth() * 0.4 && opponent.getRemainingHeals() > 0) {
+        if (p != null && p.getCurrentHealth() < p.getMaxHealth() * 0.4 && opponent.getRemainingHeals() > 0) {
             return new HealAction();
         }
 
-        // Otherwise, attack
-        List<Move> opponentMoves = opponent.getCurrentPlant().getMoves();
-        if (opponentMoves.isEmpty()) {
-            return new Move("Struggle", 10, 0, 100, 0);
+        if (p != null) {
+            List<Move> opponentMoves = p.getMoves();
+            if (opponentMoves.isEmpty()) {
+                return new Move("Struggle", 10, 0, 100, 0);
+            }
+            return opponentMoves.get(new Random().nextInt(opponentMoves.size()));
         }
-        return opponentMoves.get(new Random().nextInt(opponentMoves.size()));
+        return null;
     }
 
     private void updateUI() {
-        tvPlayerUsername.setText(player.getUsername());
-        tvPlayerPlantName.setText(player.getCurrentPlant().getName());
-        tvPlayerHp.setText("HP: " + player.getCurrentPlant().getCurrentHealth() + "/" + player.getCurrentPlant().getMaxHealth());
+        if (player.getCurrentPlant() != null) {
+            Plant p1 = player.getCurrentPlant();
+            tvPlayerUsername.setText(player.getUsername());
+            tvPlayerPlantName.setText(p1.getName());
+            tvPlayerHp.setText("HP: " + p1.getCurrentHealth() + "/" + p1.getMaxHealth());
+            hpBarPlayer.setMax(p1.getMaxHealth());
+            hpBarPlayer.setProgress(p1.getCurrentHealth());
+        }
         
-        tvOpponentUsername.setText(opponent.getUsername());
-        tvOpponentPlantName.setText(opponent.getCurrentPlant().getName());
-        tvOpponentHp.setText("HP: " + opponent.getCurrentPlant().getCurrentHealth() + "/" + opponent.getCurrentPlant().getMaxHealth());
+        if (opponent.getCurrentPlant() != null) {
+            Plant p2 = opponent.getCurrentPlant();
+            tvOpponentUsername.setText(opponent.getUsername());
+            tvOpponentPlantName.setText(p2.getName());
+            tvOpponentHp.setText("HP: " + p2.getCurrentHealth() + "/" + p2.getMaxHealth());
+            hpBarOpponent.setMax(p2.getMaxHealth());
+            hpBarOpponent.setProgress(p2.getCurrentHealth());
+        }
         
-        // Refresh special menu buttons if open (to update heal count)
         if (showingSpecial) {
             updateSpecialMenuButtons();
         }

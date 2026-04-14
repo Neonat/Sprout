@@ -1,145 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#000000">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Background Image - Full Brightness -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_info"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null" />
 
-        <!-- Back button -->
-        <Button
-            android:id="@+id/btn_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="← Back"
-            style="?android:attr/borderlessButtonStyle"
-            android:textColor="@color/white"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <!-- Plant Sprite -->
-        <ImageView
-            android:id="@+id/iv_info_sprite"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:scaleType="fitCenter"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_back"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Plant Name -->
-        <TextView
-            android:id="@+id/tv_info_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Plant Name"
-            android:textColor="@color/white"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/iv_info_sprite"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Scan Info -->
-        <TextView
-            android:id="@+id/tv_info_scan_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Scanned on: --"
-            android:textColor="#BBBBBB"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_info_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Divider -->
-        <View
-            android:id="@+id/divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#333333"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_info_scan_time" />
-
-        <!-- Stats Section -->
-        <LinearLayout
-            android:id="@+id/layout_stats"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/divider">
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="180dp"
+            android:paddingBottom="180dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <!-- Back button -->
+            <Button
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MAX HP" android:textColor="#2e7d32" android:textStyle="bold" />
-                <TextView android:id="@+id/tv_info_hp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="100" android:textColor="@color/white" android:textSize="20sp" />
+                android:text="← Back"
+                style="?android:attr/borderlessButtonStyle"
+                android:textColor="@android:color/black"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- Plant Sprite -->
+            <ImageView
+                android:id="@+id/iv_info_sprite"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:scaleType="fitCenter"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/btn_back"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Plant Name -->
+            <TextView
+                android:id="@+id/tv_info_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Plant Name"
+                android:textColor="@android:color/black"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/iv_info_sprite"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Scan Info -->
+            <TextView
+                android:id="@+id/tv_info_scan_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Scanned on: --"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:layout_marginTop="4dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_info_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#44000000"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_info_scan_time" />
+
+            <!-- Stats Section -->
+            <LinearLayout
+                android:id="@+id/layout_stats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/divider">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MAX HP" android:textColor="#2E7D32" android:textStyle="bold" />
+                    <TextView android:id="@+id/tv_info_hp" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="100" android:textColor="@android:color/black" android:textSize="18sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SPEED" android:textColor="#1565C0" android:textStyle="bold" />
+                    <TextView android:id="@+id/tv_info_speed" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="50" android:textColor="@android:color/black" android:textSize="18sp" />
+                </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <!-- Metadata Section -->
+            <TextView
+                android:id="@+id/label_details"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SPEED" android:textColor="#1976d2" android:textStyle="bold" />
-                <TextView android:id="@+id/tv_info_speed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="50" android:textColor="@color/white" android:textSize="20sp" />
-            </LinearLayout>
-        </LinearLayout>
+                android:text="Details"
+                android:textColor="#2E7D32"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_stats"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Metadata Section (Fun Facts) -->
-        <TextView
-            android:id="@+id/label_details"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Details"
-            android:textColor="#2e7d32"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/layout_stats"
-            app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/tv_info_metadata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginTop="6dp"
+                app:layout_constraintTop_toBottomOf="@id/label_details" />
 
-        <TextView
-            android:id="@+id/tv_info_metadata"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:lineSpacingExtra="4dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/label_details" />
+            <!-- Moves Section -->
+            <TextView
+                android:id="@+id/label_moves"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Moveset"
+                android:textColor="#2E7D32"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_info_metadata"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Moves Section -->
-        <TextView
-            android:id="@+id/label_moves"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Moveset"
-            android:textColor="#2e7d32"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_info_metadata"
-            app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/tv_info_moves"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"
+                app:layout_constraintTop_toBottomOf="@id/label_moves" />
 
-        <TextView
-            android:id="@+id/tv_info_moves"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/label_moves" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</FrameLayout>
