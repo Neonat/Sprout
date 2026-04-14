@@ -33,6 +33,9 @@ android {
 
         val fluxApiKey = localProperties.getProperty("FLUX_API_KEY") ?: ""
         buildConfigField("String", "FLUX_API_KEY", "\"$fluxApiKey\"")
+
+        val nvidiaApiKey = localProperties.getProperty("NVIDIA_API_KEY") ?: ""
+        buildConfigField("String", "NVIDIA_API_KEY", "\"$nvidiaApiKey\"")
     }
 
     buildTypes {
