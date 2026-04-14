@@ -1,87 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
-
-    <Button
-        android:id="@+id/btn_back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="← Back"
-        android:layout_gravity="start"
-        android:layout_marginBottom="16dp"
-        style="?android:attr/borderlessButtonStyle"
-        android:textColor="#888888"
-        android:textSize="15sp" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_scan"
-        android:layout_width="200dp"
-        android:layout_height="52dp"
-        android:text="Take Photo"
-        android:textSize="15sp"
-        android:textColor="@color/white"
-        app:backgroundTint="@color/btn_tint"
-        app:cornerRadius="26dp"
-        app:rippleColor="@android:color/transparent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_upload"
-        android:layout_width="200dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="12dp"
-        android:text="Upload Image"
-        android:textSize="15sp"
-        android:textColor="@color/white"
-        app:backgroundTint="@color/btn_tint"
-        app:cornerRadius="26dp"
-        app:rippleColor="@android:color/transparent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_test"
-        android:layout_width="200dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="12dp"
-        android:text="Use Test Image"
-        android:textSize="15sp"
-        android:textColor="@color/white"
-        app:backgroundTint="@color/btn_tint"
-        app:cornerRadius="26dp"
-        app:rippleColor="@android:color/transparent" />
-
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/tv_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:textSize="14sp"
-        android:textColor="#888888" />
-
-    <TextView
-        android:id="@+id/tv_plant_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+    android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/iv_sprite"
-        android:layout_width="256dp"
-        android:layout_height="256dp"
-        android:layout_marginTop="16dp"
-        android:scaleType="fitCenter"
-        android:visibility="gone" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_scan"
+        android:scaleType="centerCrop" />
 
-</LinearLayout>
+    <!-- Back button pinned to top-start -->
+    <Button
+        android:id="@+id/btn_back"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_gravity="top|start"
+        android:text="← Back"
+        android:background="@drawable/btn_background"
+        app:backgroundTint="#80000000"
+        android:textColor="@color/white"
+        android:textSize="15sp" />
+
+    <!-- Full-height column: spacer | results | buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
+
+        <!-- Pushes content below the back button (~100dp header area) -->
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="3" />
+
+        <!-- Results area: loading, status text, plant name, sprite -->
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="14sp"
+            android:textColor="#888888" />
+
+        <TextView
+            android:id="@+id/tv_plant_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/iv_sprite"
+            android:layout_width="256dp"
+            android:layout_height="256dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <!-- Pushes buttons to bottom -->
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Action buttons pinned to bottom -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_scan"
+            android:layout_width="200dp"
+            android:layout_height="52dp"
+            android:layout_marginBottom="48dp"
+            android:layout_marginRight="80dp"
+            android:text="Take Photo"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:includeFontPadding="false"
+            android:paddingTop="4dp"
+            app:backgroundTint="#BF6B2A8A"
+            app:cornerRadius="26dp"
+            app:rippleColor="@android:color/transparent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_upload"
+            android:layout_width="200dp"
+            android:layout_height="52dp"
+            android:layout_marginBottom="92dp"
+            android:layout_marginRight="80dp"
+            android:text="Upload Image"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:includeFontPadding="false"
+            android:paddingTop="4dp"
+            app:backgroundTint="#BF6B2A8A"
+            app:cornerRadius="26dp"
+            app:rippleColor="@android:color/transparent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_test"
+            android:layout_width="200dp"
+            android:layout_height="52dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="80dp"
+            android:text="Use Test Image"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:includeFontPadding="false"
+            android:paddingTop="4dp"
+            app:backgroundTint="#BF6B2A8A"
+            app:cornerRadius="26dp"
+            app:rippleColor="@android:color/transparent" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="2" />
+    </LinearLayout>
+
+</FrameLayout>

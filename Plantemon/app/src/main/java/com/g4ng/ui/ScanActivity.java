@@ -23,8 +23,8 @@ import androidx.core.content.FileProvider;
 
 import com.g4ng.logic.PlantFactory;
 import com.g4ng.model.Plant;
-import com.g4ng.service.AiSpriteGenerator;
 import com.g4ng.service.PlantApiService;
+import com.g4ng.service.SpriteGeneratorService;
 
 import org.json.JSONObject;
 
@@ -146,6 +146,13 @@ public class ScanActivity extends AppCompatActivity {
     private void processBytes(byte[] photoBytes) {
         if (!isProcessing.compareAndSet(false, true)) return;
 
+        Bitmap photoBitmap = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.length);
+        if (photoBitmap == null) {
+            tvStatus.setText("Failed to decode image");
+            isProcessing.set(false);
+            return;
+        }
+
         btnScan.setEnabled(false);
         progress.setVisibility(View.VISIBLE);
         tvStatus.setText("Identifying plant...");
@@ -175,27 +182,52 @@ public class ScanActivity extends AppCompatActivity {
                     tvStatus.setText("Generating sprite...");
                 });
 
-                // 2. Generate sprite based on plant name
-                AiSpriteGenerator spriteGen = new AiSpriteGenerator();
-                byte[] spriteBytes = spriteGen.generateSprite(plantName);
+                // 2. Generate sprite using photo + plant name (delivers callback on main thread)
+                new SpriteGeneratorService(this).generate(photoBitmap, plantName,
+                        new SpriteGeneratorService.SpriteCallback() {
+                            @Override
+                            public void onSuccess(Bitmap sprite) {
+                                // Save to file and create plant on a background thread
+                                new Thread(() -> {
+                                    try {
+                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                        sprite.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                                        String spritePath = saveSpriteToFile(plantName, baos.toByteArray());
 
-                // Save sprite to file
-                String spritePath = saveSpriteToFile(plantName, spriteBytes);
+                                        // 3. Assemble Plant — passes already-parsed JSON to avoid re-parsing
+                                        scannedPlant = PlantFactory.createFromApi(plantJson, spritePath);
+                                        GameState.getPlayer().getGarden().add(scannedPlant);
+                                        Log.d(TAG, "Plant created: " + scannedPlant.getName());
 
-                // 3. Assemble full Plant object — passes already-parsed JSON to avoid re-parsing
-                scannedPlant = PlantFactory.createFromApi(plantJson, spritePath);
-                GameState.getPlayer().getGarden().add(scannedPlant);
-                Log.d(TAG, "Plant created: " + scannedPlant.getName());
+                                        runOnUiThread(() -> {
+                                            ivSprite.setImageBitmap(sprite);
+                                            ivSprite.setVisibility(View.VISIBLE);
+                                            tvStatus.setText("Done!");
+                                            progress.setVisibility(View.GONE);
+                                            btnScan.setEnabled(true);
+                                        });
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "Finalising plant failed", e);
+                                        runOnUiThread(() -> {
+                                            tvStatus.setText("Error: " + e.getMessage());
+                                            progress.setVisibility(View.GONE);
+                                            btnScan.setEnabled(true);
+                                        });
+                                    } finally {
+                                        isProcessing.set(false);
+                                    }
+                                }).start();
+                            }
 
-                Bitmap sprite = BitmapFactory.decodeFile(spritePath);
-
-                runOnUiThread(() -> {
-                    ivSprite.setImageBitmap(sprite);
-                    ivSprite.setVisibility(View.VISIBLE);
-                    tvStatus.setText("Done!");
-                    progress.setVisibility(View.GONE);
-                    btnScan.setEnabled(true);
-                });
+                            @Override
+                            public void onError(String error) {
+                                Log.e(TAG, "Sprite generation failed: " + error);
+                                tvStatus.setText("Error: " + error);
+                                progress.setVisibility(View.GONE);
+                                btnScan.setEnabled(true);
+                                isProcessing.set(false);
+                            }
+                        });
 
             } catch (Exception e) {
                 Log.e(TAG, "Processing failed", e);
@@ -204,7 +236,6 @@ public class ScanActivity extends AppCompatActivity {
                     progress.setVisibility(View.GONE);
                     btnScan.setEnabled(true);
                 });
-            } finally {
                 isProcessing.set(false);
             }
         }).start();
