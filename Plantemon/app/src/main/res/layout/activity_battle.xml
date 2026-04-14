@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#000000"
-    android:paddingTop="24dp">
+    android:background="#121212">
 
+    <!-- Top Navigation -->
     <Button
         android:id="@+id/btn_back"
         android:layout_width="wrap_content"
@@ -13,167 +15,218 @@
         android:text="← Back"
         style="?android:attr/borderlessButtonStyle"
         android:textColor="#BBBBBB"
-        android:textSize="15sp"
-        android:layout_marginStart="4dp" />
+        android:textSize="14sp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"/>
 
-    <LinearLayout
+    <!-- Battle Arena -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/battleArena"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#2e7d32"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
+        <!-- Background Image (Sharp Pixel Art) -->
+
+        <!-- Opponent Status (Top Left) -->
         <ImageView
-            android:id="@+id/imageViewOpponentSprite"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="Battle background"
             android:scaleType="centerCrop"
-            android:contentDescription="Opponent sprite" />
+            android:src="@drawable/bg_battle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/layoutOpponentStatus"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
+            android:background="#CCFFFFFF"
             android:orientation="vertical"
-            android:layout_marginStart="12dp">
-
-            <TextView
-                android:id="@+id/textViewOpponentUsername"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#BBBBBB"
-                android:textSize="12sp"
-                android:text="Opponent" />
+            android:padding="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:elevation="4dp">
 
             <TextView
                 android:id="@+id/textViewOpponentPlantName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:textStyle="bold"
-                android:textSize="15sp"
-                android:text="Opponent Plant" />
+                android:textSize="14sp"
+                tools:text="Opponent Plant" />
+
+            <TextView
+                android:id="@+id/textViewOpponentUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#666666"
+                android:textSize="10sp"
+                tools:text="Opponent" />
+
+            <ProgressBar
+                android:id="@+id/hpBarOpponent"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:progress="100"
+                android:progressTint="#FF0000"
+                android:layout_marginTop="4dp"/>
 
             <TextView
                 android:id="@+id/textViewOpponentHp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:text="HP: 100/100" />
+                android:textColor="#333333"
+                android:textSize="11sp"
+                tools:text="HP: 100/100" />
         </LinearLayout>
-    </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="BATTLE ARENA"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:gravity="center" />
+        <!-- Opponent Sprite (Top Right) -->
+        <ImageView
+            android:id="@+id/imageViewOpponentSprite"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="Opponent sprite" />
 
+        <!-- Player Sprite (Bottom Left) -->
+        <ImageView
+            android:id="@+id/imageViewPlayerSprite"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:contentDescription="Player sprite" />
+
+        <!-- Player Status (Bottom Right) -->
+        <LinearLayout
+            android:id="@+id/layoutPlayerStatus"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:background="#CCFFFFFF"
+            android:orientation="vertical"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="48dp"
+            android:layout_marginEnd="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:id="@+id/textViewPlayerPlantName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                tools:text="Your Plant" />
+
+            <TextView
+                android:id="@+id/textViewPlayerUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#666666"
+                android:textSize="10sp"
+                tools:text="You" />
+
+            <ProgressBar
+                android:id="@+id/hpBarPlayer"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:progress="100"
+                android:progressTint="#4CAF50"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/textViewPlayerHp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#333333"
+                android:textSize="11sp"
+                tools:text="HP: 100/100" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Battle Log Message -->
     <TextView
         android:id="@+id/textViewBattleLog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#c62828"
+        android:background="#333333"
         android:textColor="#FFFFFF"
-        android:textStyle="bold"
+        android:padding="16dp"
         android:textSize="14sp"
-        android:padding="12dp"
-        android:visibility="gone"
-        android:text="" />
+        android:textStyle="italic"
+        android:minLines="2"
+        android:text="What will you do?" />
 
+    <!-- Action Panel -->
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
-        android:padding="8dp">
+        android:padding="8dp"
+        android:background="#1E1E1E">
 
         <Button
             android:id="@+id/buttonMove1"
             android:layout_width="0dp"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
-            android:text="Solar Bloom" />
+            android:text="Move 1"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/buttonMove2"
             android:layout_width="0dp"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
-            android:text="Tidal Root Snare" />
+            android:text="Move 2"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/buttonMove3"
             android:layout_width="0dp"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
-            android:text="Golden Pollen Burst" />
+            android:text="Move 3"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/buttonMove4"
             android:layout_width="0dp"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
-            android:text="Sunpetal Burst" />
+            android:text="Move 4"
+            android:textSize="12sp" />
     </GridLayout>
 
-    <LinearLayout
+    <Button
+        android:id="@+id/buttonUseSpecial"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#2e7d32"
-        android:orientation="horizontal"
-        android:padding="12dp">
-
-        <ImageView
-            android:id="@+id/imageViewPlayerSprite"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="Player sprite" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="12dp">
-
-            <TextView
-                android:id="@+id/textViewPlayerUsername"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#BBBBBB"
-                android:textSize="12sp"
-                android:text="You" />
-
-            <TextView
-                android:id="@+id/textViewPlayerPlantName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:text="Your Plant" />
-
-            <TextView
-                android:id="@+id/textViewPlayerHp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:text="HP: 100/100" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/buttonUseSpecial"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#1b5e20"
-            android:textColor="#FFFFFF"
-            android:text="Use Special"
-            android:layout_gravity="center_vertical" />
-    </LinearLayout>
+        android:layout_margin="8dp"
+        android:backgroundTint="#FF9800"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:text="USE SPECIAL ACTION" />
 
 </LinearLayout>
