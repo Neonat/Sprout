@@ -9,14 +9,12 @@ public class Move implements Action {
     private final int attack;
     private final int defense;
     private final int accuracy;
-    private final int power;
 
-    public Move(String name, int attack, int defense, int accuracy, int power) {
+    public Move(String name, int attack, int defense, int accuracy) {
         this.name = name;
         this.attack = attack;
         this.defense = defense;
         this.accuracy = accuracy;
-        this.power = power;
     }
 
     @Override
@@ -28,7 +26,7 @@ public class Move implements Action {
             int opponentDefense = (opponentAction != null) ? opponentAction.getDefenseValue() : 0;
             
             // Damage = Attack - Defense.
-            int damage = Math.max(1, this.attack - opponentDefense);
+            int damage = this.attack - opponentDefense;
             
             targetPlant.takeDamage(damage);
             String result = attackerPlant.getName() + " used " + name + " and dealt " + damage + " damage!";
@@ -60,9 +58,5 @@ public class Move implements Action {
 
     public int getAccuracy() {
         return accuracy;
-    }
-
-    public int getPower() {
-        return power;
     }
 }

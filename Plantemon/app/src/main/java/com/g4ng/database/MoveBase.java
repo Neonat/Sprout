@@ -1,38 +1,57 @@
 package com.g4ng.database;
-import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.util.HashMap;
-
+import android.util.JsonReader;
 import com.g4ng.logic.Move;
+import java.io.IOException;
+import java.util.HashMap;
 
 // Singleton class to load JSON data and turn it into a hash map
 // JSON will contain an array of objects
 // Example of a move object
-//{
-//    id: 19i,
-//    name: "Thunderbolt",
-//    attack: 10,
-//    defense: -3
-//}
+//        "id": 1,
+//                "name": "Tropical Spore",
+//                "attack": 12,
+//                "defense": 5,
+//                "accuracy": 85
+
+// HashMap will look something like this:
+/*
+Key        Value
+0         {"Photosynthesis", 0, 15, 100}
+1         {"Tropical Spore", 12, 5, 85}
+2         {"Humidity Veil", 5, 20, 100}
+ */
+
+// Sidenote: by design, higher attacking moves have lower accuracy values
 public class MoveBase extends Base<Integer, Move> {
     private static MoveBase instance;
 
     private MoveBase() {
-        // Read data from move.json, get JSON object
         data = new HashMap<>();
     }
 
     @Override
-    protected void insert(JSONObject data) {
-        Integer id = data.optInt("id", 0);
-        String name = data.optString("name", "Unknown Move");
-        int attack = data.optInt("attack", 0);
-        int defense = data.optInt("defense", 0);
-        int accuracy = data.optInt("accuracy", 100);
-        int power = data.optInt("power", 100);
-        var model = new Move(name, attack, defense, accuracy, power);
-        this.data.put(id, model);
+    protected void insert(JsonReader reader) throws IOException {
+        // default values
+        int id = 0;
+        String name = "Unknown Move";
+        int attack = 0;
+        int defense = 0;
+        int accuracy = 100;
+        // read values from JSON one by one from the stream
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String field = reader.nextName();
+            if (field.equals("id")) id = reader.nextInt();
+            else if (field.equals("name")) name = reader.nextString();
+            else if (field.equals("attack")) attack = reader.nextInt();
+            else if (field.equals("defense") || field.equals("defence")) defense = reader.nextInt();
+            else if (field.equals("accuracy")) accuracy = reader.nextInt();
+            else reader.skipValue();
+        }
+        reader.endObject();
+
+        this.data.put(id, new Move(name, attack, defense, accuracy));
     }
 
     public static MoveBase getInstance() {

@@ -65,7 +65,6 @@ public class PlantJsonHandler {
         moveJson.put("attack", move.getAttack());
         moveJson.put("defense", move.getDefense());
         moveJson.put("accuracy", move.getAccuracy());
-        moveJson.put("power", move.getPower());
         return moveJson;
     }
     private JSONObject convertPlantToJsonObject(Plant plant) throws JSONException {
@@ -107,8 +106,7 @@ public class PlantJsonHandler {
                         moveJson.getString("name"),
                         moveJson.getInt("attack"),
                         moveJson.getInt("defense"),
-                        moveJson.getInt("accuracy"),
-                        moveJson.getInt("power")
+                        moveJson.getInt("accuracy")
                 );
                 plant.addMove(move);
             }

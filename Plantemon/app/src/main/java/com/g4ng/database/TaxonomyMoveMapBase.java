@@ -1,11 +1,9 @@
 package com.g4ng.database;
 
+import android.util.JsonReader;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +11,8 @@ import java.util.List;
 
 // Use taxonomy to acquire a mapping for moves
 // Future: map based on region and seasons
+// Singleton class to load JSON data and turn it into a hash map
+
 public class TaxonomyMoveMapBase extends Base<Integer, List<Integer>> {
     private static TaxonomyMoveMapBase instance;
     private final String TAG = "TaxonomyMoveMapBase";
@@ -21,30 +21,40 @@ public class TaxonomyMoveMapBase extends Base<Integer, List<Integer>> {
     private final String[] CONIFERS = {"Pinopsida", "Cycadopsida", "Ginkgoopsida", "Gnetopsida"};
     private final HashSet<String> fernSet = new HashSet<>(List.of(FERNS));
     private final HashSet<String> coniferSet = new HashSet<>(List.of(CONIFERS));
+
     public static TaxonomyMoveMapBase getInstance() {
         if (instance == null) {
             instance = new TaxonomyMoveMapBase();
         }
         return instance;
     }
+
     private TaxonomyMoveMapBase() {
         data = new HashMap<>();
     }
 
     @Override
-    protected void insert(JSONObject data) throws JSONException {
-        int id = data.optInt("id", 0);
-        JSONArray moveIdsRaw = data.optJSONArray("moves");
+    protected void insert(JsonReader reader) throws IOException {
+        int id = 0;
         List<Integer> moveIds = new ArrayList<>();
-        int length = 0;
-        if (moveIdsRaw != null) {
-            length = moveIdsRaw.length();
-        }
-        if (length != 0) {
-            for (int i = 0; i < length; i++) {
-                moveIds.add(moveIdsRaw.getInt(i));
+
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (name.equals("id")) {
+                id = reader.nextInt();
+            } else if (name.equals("moves")) {
+                reader.beginArray();
+                while (reader.hasNext()) {
+                    moveIds.add(reader.nextInt());
+                }
+                reader.endArray();
+            } else {
+                reader.skipValue();
             }
         }
+        reader.endObject();
+
         Log.i(TAG, "insert: " + id + moveIds.toString());
         this.data.put(id, moveIds);
     }
