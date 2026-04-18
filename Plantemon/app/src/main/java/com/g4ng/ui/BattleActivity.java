@@ -236,7 +236,7 @@ public class BattleActivity extends AppCompatActivity {
         if (p != null) {
             List<Move> opponentMoves = p.getMoves();
             if (opponentMoves.isEmpty()) {
-                return new Move("Struggle", 10, 0, 100, 0);
+                return new Move("Struggle", 10, 0, 100);
             }
             return opponentMoves.get(new Random().nextInt(opponentMoves.size()));
         }

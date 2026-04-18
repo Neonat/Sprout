@@ -13,6 +13,15 @@ import java.util.List;
 // Future: map based on region and seasons
 // Singleton class to load JSON data and turn it into a hash map
 
+/*
+HashMap will look something like this:
+Key        Value
+0         {[0, 2, 6, 9, 12, 13, 19]} the values correspond to move IDs
+1         {[1, 3, 5, 8, 14, 15]}
+2         {[20, 11, 16, 17]}
+3         {[4, 7, 10, 18]}
+ */
+
 public class TaxonomyMoveMapBase extends Base<Integer, List<Integer>> {
     private static TaxonomyMoveMapBase instance;
     private final String TAG = "TaxonomyMoveMapBase";
