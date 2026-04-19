@@ -23,7 +23,7 @@ public class HealAction implements Action {
         int oldHealth = targetPlant.getCurrentHealth();
         int healAmount = calculateHealAmount(targetPlant);
         
-        targetPlant.setCurrentHealth(Math.min(targetPlant.getCurrentHealth() + healAmount, targetPlant.getMaxHealth()));
+        targetPlant.setCurrentHealth(Math.min(targetPlant.getCurrentHealth() + healAmount, 100));
         performer.useHeal();
 
         int actualHeal = targetPlant.getCurrentHealth() - oldHealth;

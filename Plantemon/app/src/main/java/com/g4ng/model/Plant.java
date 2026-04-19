@@ -89,7 +89,9 @@ public class Plant implements Serializable {
     public List<Move> getMoves() { return moves; }
     public int getMaxHealth() { return maxHealth; }
     public int getCurrentHealth() { return currentHealth; }
-    public void setCurrentHealth(int health) { this.currentHealth = health; }
+    public void setCurrentHealth(int health) { 
+        this.currentHealth = Math.min(health, this.maxHealth); 
+    }
     public void takeDamage(int amount) {
         this.currentHealth = Math.max(this.currentHealth - amount, 0);
     }
@@ -108,4 +110,11 @@ public class Plant implements Serializable {
     public String getSpritePath() { return spritePath; }
 
     public void addMove(Move move) { this.moves.add(move); }
+
+    public String getTaxonomy() { return taxonomy; 
+    }
+
+    public void setScanDateTime(Date scanDateTime) {
+        this.scanDateTime = scanDateTime;
+    }
 }

@@ -97,14 +97,14 @@ public class BattleHandler {
 
     public void processTurn() {
         turnResults.clear();
-        Plant p1 = player1.getCurrentPlant();
-        Plant p2 = player2.getCurrentPlant();
+        Plant plant1 = player1.getCurrentPlant();
+        Plant plant2 = player2.getCurrentPlant();
 
-        if (p1.getSpeed() >= p2.getSpeed()) {
-            turnResults.add("--- " + p1.getName() + " is faster! ---");
+        if (plant1.getSpeed() >= plant2.getSpeed()) {
+            turnResults.add("--- " + player1.getUsername() + "'s " + plant1.getName() + " is faster! ---");
             executeSequence(p1SelectedAction, p2SelectedAction, player1, player2);
         } else {
-            turnResults.add("--- " + p2.getName() + " is faster! ---");
+            turnResults.add("--- " + player2.getUsername() + "'s " + plant2.getName() + " is faster! ---");
             executeSequence(p2SelectedAction, p1SelectedAction, player2, player1);
         }
 

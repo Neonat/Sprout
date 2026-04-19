@@ -25,15 +25,16 @@ public class Move implements Action {
         if (Math.random() * 100 <= accuracy) {
             int opponentDefense = (opponentAction != null) ? opponentAction.getDefenseValue() : 0;
             
-            // Damage = Attack - Defense.
-            int damage = this.attack - opponentDefense;
+            // Damage logic to increase dynamism
+            double variation = 0.7 + (Math.random() * 0.4);
+            int damage = (int)((this.attack - (opponentDefense * variation)) * variation);
             
             targetPlant.takeDamage(damage);
-            String result = attackerPlant.getName() + " used " + name + " and dealt " + damage + " damage!";
+            String result = performer.getUsername()+ "'s " + attackerPlant.getName() + " used " + name + " and dealt " + damage + " damage!";
             Log.d("BattleLogic", result);
             return result;
         } else {
-            String result = attackerPlant.getName() + " missed " + name + "!";
+            String result = performer.getUsername()+ "'s " + attackerPlant.getName() + " missed " + name + "!";
             Log.d("BattleLogic", result);
             return result;
         }

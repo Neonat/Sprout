@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -74,6 +75,21 @@ public class PlantJsonHandler {
         plantJson.put("maxHealth", plant.getMaxHealth());
         plantJson.put("speed", plant.getSpeed());
         plantJson.put("spritePath", plant.getSpritePath());
+
+        // Save scan time
+        if (plant.getScanDateTime() != null) {
+            plantJson.put("scanDateTime", plant.getScanDateTime().getTime());
+        }
+
+        // Save metadata fields
+        plantJson.put("description", plant.getDescription());
+        plantJson.put("taxonomy", plant.getTaxonomy());
+        plantJson.put("bestLightCondition", plant.getBestLightCondition());
+        plantJson.put("bestSoilType", plant.getBestSoilType());
+        plantJson.put("commonUses", plant.getCommonUses());
+        plantJson.put("toxicity", plant.getToxicity());
+        plantJson.put("bestWatering", plant.getBestWatering());
+
         plantJson.put("moves", convertMoveListToJsonArray(plant.getMoves()));
         return plantJson;
     }
@@ -99,6 +115,21 @@ public class PlantJsonHandler {
         for (int i = 0; i < plantsArray.length(); i++) {
             JSONObject plantJson = plantsArray.getJSONObject(i);
             Plant plant = PlantFactory.createFromSaved(plantJson);
+
+            // Restore scan time
+            if (plantJson.has("scanDateTime")) {
+                plant.setScanDateTime(new Date(plantJson.getLong("scanDateTime")));
+            }
+
+            // Restore metadata fields
+            plant.setDescription(plantJson.optString("description", null));
+            plant.setTaxonomy(plantJson.optString("taxonomy", null));
+            plant.setBestLightCondition(plantJson.optString("bestLightCondition", null));
+            plant.setBestSoilType(plantJson.optString("bestSoilType", null));
+            plant.setCommonUses(plantJson.optString("commonUses", null));
+            plant.setToxicity(plantJson.optString("toxicity", null));
+            plant.setBestWatering(plantJson.optString("bestWatering", null));
+
             JSONArray moves = plantJson.getJSONArray("moves");
             for (int j = 0; j < moves.length(); j++) {
                 JSONObject moveJson = moves.getJSONObject(j);
