@@ -29,6 +29,9 @@ public class Move implements Action {
             double variation = 0.7 + (Math.random() * 0.4);
             int damage = (int)((this.attack - (opponentDefense * variation)) * variation);
             
+            // Fix: Ensure damage is never negative (which would heal the opponent)
+            damage = Math.max(0, damage);
+            
             targetPlant.takeDamage(damage);
             String result = performer.getUsername()+ "'s " + attackerPlant.getName() + " used " + name + " and dealt " + damage + " damage!";
             Log.d("BattleLogic", result);

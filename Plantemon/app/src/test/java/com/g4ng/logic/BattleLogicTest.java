@@ -52,7 +52,7 @@ public class BattleLogicTest {
         p1.setCurrentPlant(p1.getGarden().get(0));
         p2.setCurrentPlant(p2.getGarden().get(0));
 
-        battleHandler = new BattleHandler(p1, p2, new BotController(), new BotController());
+        battleHandler = new BattleHandler(p1, p2, new HumanController(), new HumanController());
     }
 
     @Test
@@ -82,17 +82,22 @@ public class BattleLogicTest {
         System.out.println("Stage 1: Inflicting 50 damage to Ash's Bulbasaur");
         p1.getCurrentPlant().takeDamage(50);
         int healthBefore = p1.getCurrentPlant().getCurrentHealth();
+        System.out.println("Ash's " + p1.getCurrentPlant().getName() + " has " + healthBefore + " HP.");
         
-        System.out.println("Stage 2: Ash uses HealAction(30), Gary waits");
+        System.out.println("Stage 2: Ash uses HealAction, Gary waits");
         HealAction heal = new HealAction();
-        // heal by 20% + 10hp
+        // Calculation: (100 * 0.2) + 10 = 30 HP
+        
+        // In the real app, useHeal is called in the UI. 
+        // We simulate that here to maintain consistency with the Player's resource logic.
+        p1.useHeal();  // remainingheal shd decrease
         battleHandler.applyAction(p1, heal);
-        // take 1hp damage
         battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100)); // P2 does nothing
         
-        assertTrue(p1.getCurrentPlant().getCurrentHealth() > healthBefore);
-        assertEquals(healthBefore + 29, p1.getCurrentPlant().getCurrentHealth());
-        System.out.println("Result: Health increased by exactly 29.");
+        int healthAfter = p1.getCurrentPlant().getCurrentHealth();
+        assertTrue(healthAfter > healthBefore);
+        assertEquals(healthBefore + 30, healthAfter);
+        System.out.println("Result: Health increased by exactly 30 HP.");
     }
     
     @Test
