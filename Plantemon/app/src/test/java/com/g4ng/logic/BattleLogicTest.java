@@ -14,7 +14,7 @@ import java.util.List;
 public class BattleLogicTest {
     private Player p1;
     private Player p2;
-    private LocalBattleHandler battleHandler;
+    private BattleHandler battleHandler;
 
     @Before
     public void setUp() {
@@ -52,7 +52,7 @@ public class BattleLogicTest {
         p1.setCurrentPlant(p1.getGarden().get(0));
         p2.setCurrentPlant(p2.getGarden().get(0));
 
-        battleHandler = new LocalBattleHandler(p1, p2);
+        battleHandler = new BattleHandler(p1, p2, new BotController(), new BotController());
     }
 
     @Test
