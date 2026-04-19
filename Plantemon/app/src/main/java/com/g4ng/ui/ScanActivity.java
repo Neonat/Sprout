@@ -293,10 +293,10 @@ public class ScanActivity extends AppCompatActivity {
     private Plant buildFallbackPlant(String name, String spritePath) {
         int speed = 5 + new Random().nextInt(20);
         Plant p = new Plant(name, speed, spritePath);
-        p.addMove(new Move("Tackle",      15,  0,  95, 100));
-        p.addMove(new Move("Vine Whip",   20,  0,  90, 100));
-        p.addMove(new Move("Leaf Shield",  0, 10, 100, 100));
-        p.addMove(new Move("Solar Blast", 35, -5,  75, 100));
+        p.addMove(new Move("Tackle",      15,  0,  90));
+        p.addMove(new Move("Vine Whip",   20,  0,  85));
+        p.addMove(new Move("Leaf Shield",  0, 10, 100));
+        p.addMove(new Move("Solar Blast", 35, -5,  75));
         return p;
     }
 

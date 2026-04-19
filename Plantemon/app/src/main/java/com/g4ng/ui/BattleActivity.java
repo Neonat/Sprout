@@ -87,11 +87,11 @@ public class BattleActivity extends AppCompatActivity {
         // Player setup
         player = GameState.getPlayer();
 
-        // Bot setup
+        // Bot setup, hard coded so that it is only player vs CPU for now
         List<Plant> opponentGarden = new ArrayList<>();
         Random r = new Random();
         for (Plant plant : player.getGarden()) {
-            opponentGarden.add(new Plant(plant));
+            opponentGarden.add(new Plant(plant)); // bot will have the exact same plants as player
         }
         opponent = new Player("Gary (BOT)", opponentGarden);
         
@@ -168,17 +168,17 @@ public class BattleActivity extends AppCompatActivity {
     }
 
     private void handlePlayerAction(Action action) {
+        // gets called after player presses a button for his/her own move selection
         if (battleHandler.getState() != BattleState.P1_MOVE) return;
 
         setButtonsEnabled(false);
         battleHandler.applyAction(player, action);
 
-        // Process bot turn
-        if (battleHandler.getState() == BattleState.P2_MOVE) {
-            Action botAction = selectBotAction();
-            battleHandler.applyAction(opponent, botAction);
-        }
-
+        // After player action, BattleHandler automatically transitions to P2_MOVE
+        // and calls BotController.requestAction internally.
+        // Separation of Concerns: selectBotAction should not be here in this class,
+        // all decisions should be made in BotController
+        // BattleActivity should only take care of updating the UI and handling user input
         displayTurnResults();
     }
 
@@ -225,22 +225,6 @@ public class BattleActivity extends AppCompatActivity {
             btnMove3.setEnabled(false);
             btnMove4.setEnabled(false);
         }
-    }
-
-    private Action selectBotAction() {
-        Plant p = opponent.getCurrentPlant();
-        if (p != null && p.getCurrentHealth() < p.getMaxHealth() * 0.4 && opponent.getRemainingHeals() > 0) {
-            return new HealAction();
-        }
-
-        if (p != null) {
-            List<Move> opponentMoves = p.getMoves();
-            if (opponentMoves.isEmpty()) {
-                return new Move("Struggle", 10, 0, 100);
-            }
-            return opponentMoves.get(new Random().nextInt(opponentMoves.size()));
-        }
-        return null;
     }
 
     private void updateUI() {

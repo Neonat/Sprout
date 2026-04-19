@@ -14,13 +14,13 @@ import java.util.HashMap;
 //                "defense": 5,
 //                "accuracy": 85
 
-// HashMap will look something like this:
-/*
-Key        Value
-0         {"Photosynthesis", 0, 15, 100}
-1         {"Tropical Spore", 12, 5, 85}
-2         {"Humidity Veil", 5, 20, 100}
- */
+// moveBase will look something like this:
+            /*
+            Key        Value
+            0         Move("Photosynthesis", 0, 15, 100)
+            1         Move("Tropical Spore", 12, 5, 85)
+            2         Move("Humidity Veil", 5, 20, 100)
+             */
 
 // Sidenote: by design, higher attacking moves have lower accuracy values
 public class MoveBase extends Base<Integer, Move> {
@@ -51,7 +51,8 @@ public class MoveBase extends Base<Integer, Move> {
         }
         reader.endObject();
 
-        this.data.put(id, new Move(name, attack, defense, accuracy));
+        this.data.put(id, new Move(name, attack, defense, accuracy)); // actual Move objects added
+        // to hashmap here
     }
 
     public static MoveBase getInstance() {
