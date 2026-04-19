@@ -9,14 +9,12 @@ public class Move implements Action {
     private final int attack;
     private final int defense;
     private final int accuracy;
-    private final int power;
 
-    public Move(String name, int attack, int defense, int accuracy, int power) {
+    public Move(String name, int attack, int defense, int accuracy) {
         this.name = name;
         this.attack = attack;
         this.defense = defense;
         this.accuracy = accuracy;
-        this.power = power;
     }
 
     @Override
@@ -27,15 +25,19 @@ public class Move implements Action {
         if (Math.random() * 100 <= accuracy) {
             int opponentDefense = (opponentAction != null) ? opponentAction.getDefenseValue() : 0;
             
-            // Damage = Attack - Defense.
-            int damage = Math.max(1, this.attack - opponentDefense);
+            // Damage logic to increase dynamism
+            double variation = 0.7 + (Math.random() * 0.4);
+            int damage = (int)((this.attack - (opponentDefense * variation)) * variation);
+            
+            // Fix: Ensure damage is never negative (which would heal the opponent)
+            damage = Math.max(0, damage);
             
             targetPlant.takeDamage(damage);
-            String result = attackerPlant.getName() + " used " + name + " and dealt " + damage + " damage!";
+            String result = performer.getUsername()+ "'s " + attackerPlant.getName() + " used " + name + " and dealt " + damage + " damage!";
             Log.d("BattleLogic", result);
             return result;
         } else {
-            String result = attackerPlant.getName() + " missed " + name + "!";
+            String result = performer.getUsername()+ "'s " + attackerPlant.getName() + " missed " + name + "!";
             Log.d("BattleLogic", result);
             return result;
         }
@@ -60,9 +62,5 @@ public class Move implements Action {
 
     public int getAccuracy() {
         return accuracy;
-    }
-
-    public int getPower() {
-        return power;
     }
 }

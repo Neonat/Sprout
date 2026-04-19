@@ -68,7 +68,7 @@ public class BattleActivity extends AppCompatActivity {
 
         imageViewPlayerSprite = findViewById(R.id.imageViewPlayerSprite);
         imageViewOpponentSprite = findViewById(R.id.imageViewOpponentSprite);
-        
+
         tvBattleLog = findViewById(R.id.textViewBattleLog);
 
         btnMove1 = findViewById(R.id.buttonMove1);
@@ -78,7 +78,7 @@ public class BattleActivity extends AppCompatActivity {
         btnSpecial = findViewById(R.id.buttonUseSpecial);
 
         btnSpecial.setOnClickListener(v -> toggleSpecialMenu());
-        
+
         tvBattleLog.setVisibility(View.VISIBLE);
         tvBattleLog.setText("Choose a move!");
     }
@@ -87,21 +87,21 @@ public class BattleActivity extends AppCompatActivity {
         // Player setup
         player = GameState.getPlayer();
 
-        // Bot setup
+        // Bot setup, hard coded so that it is only player vs CPU for now
         List<Plant> opponentGarden = new ArrayList<>();
         Random r = new Random();
         for (Plant plant : player.getGarden()) {
-            opponentGarden.add(new Plant(plant));
+            opponentGarden.add(new Plant(plant)); // bot will have the exact same plants as player
         }
         opponent = new Player("Gary (BOT)", opponentGarden);
-        
+
         if (!player.getGarden().isEmpty()) {
             player.setCurrentPlant(player.getGarden().get(r.nextInt(player.getGarden().size())));
         }
         if (!opponent.getGarden().isEmpty()) {
             opponent.setCurrentPlant(opponent.getGarden().get(r.nextInt(opponent.getGarden().size())));
         }
-        
+
         battleHandler = new BattleHandler(player, opponent, new HumanController(), new BotController());
         setupMoveButtons();
         setupPlantemonImages();
@@ -131,7 +131,9 @@ public class BattleActivity extends AppCompatActivity {
         if (move != null) {
             btn.setText(move.getName());
             btn.setVisibility(View.VISIBLE);
-            btn.setOnClickListener(v -> handlePlayerAction(move));
+            btn.setOnClickListener(v -> {
+                handlePlayerAction(move);
+            });
         } else {
             btn.setVisibility(View.INVISIBLE);
         }
@@ -144,6 +146,8 @@ public class BattleActivity extends AppCompatActivity {
             updateSpecialMenuButtons();
             btnMove3.setVisibility(View.INVISIBLE);
             btnMove4.setVisibility(View.INVISIBLE);
+            // Ensure correct button states when menu is toggled
+            setButtonsEnabled(battleHandler.getState() == BattleState.P1_MOVE);
         } else {
             btnSpecial.setText("Use Special");
             btnMove3.setVisibility(View.VISIBLE);
@@ -158,33 +162,34 @@ public class BattleActivity extends AppCompatActivity {
             int healAmount = HealAction.calculateHealAmount(player.getCurrentPlant());
             int remaining = player.getRemainingHeals();
             btnMove1.setText("Heal (" + healAmount + " HP) x " + remaining);
-            btnMove1.setEnabled(remaining > 0);
-            btnMove1.setOnClickListener(v -> handlePlayerAction(new HealAction()));
-            
+            // Removed btnMove1.setEnabled here; setButtonsEnabled handles it based on turn logic
+            btnMove1.setOnClickListener(v -> {
+                handlePlayerAction(new HealAction());
+            });
             btnMove2.setText("Switch (N/A)");
-            btnMove2.setEnabled(false);
+            // Removed btnMove2.setEnabled here; setButtonsEnabled handles it
             btnMove2.setOnClickListener(null);
         }
     }
 
     private void handlePlayerAction(Action action) {
+        // gets called after player presses a button for his/her own move selection
         if (battleHandler.getState() != BattleState.P1_MOVE) return;
 
         setButtonsEnabled(false);
         battleHandler.applyAction(player, action);
 
-        // Process bot turn
-        if (battleHandler.getState() == BattleState.P2_MOVE) {
-            Action botAction = selectBotAction();
-            battleHandler.applyAction(opponent, botAction);
-        }
-
+        // After player action, BattleHandler automatically transitions to P2_MOVE
+        // and calls BotController.requestAction internally.
+        // Separation of Concerns: selectBotAction should not be here in this class,
+        // all decisions should be made in BotController
+        // BattleActivity should only take care of updating the UI and handling user input
         displayTurnResults();
     }
 
     private void displayTurnResults() {
         List<String> results = battleHandler.getLatestTurnResults();
-        
+
         Handler handler = new Handler();
         for (int i = 0; i < results.size(); i++) {
             final String result = results.get(i);
@@ -210,7 +215,7 @@ public class BattleActivity extends AppCompatActivity {
         if (enabled) {
             if (showingSpecial) {
                 btnMove1.setEnabled(player.getRemainingHeals() > 0);
-                btnMove2.setEnabled(false); 
+                btnMove2.setEnabled(false);
                 btnMove3.setEnabled(false);
                 btnMove4.setEnabled(false);
             } else {
@@ -227,22 +232,6 @@ public class BattleActivity extends AppCompatActivity {
         }
     }
 
-    private Action selectBotAction() {
-        Plant p = opponent.getCurrentPlant();
-        if (p != null && p.getCurrentHealth() < p.getMaxHealth() * 0.4 && opponent.getRemainingHeals() > 0) {
-            return new HealAction();
-        }
-
-        if (p != null) {
-            List<Move> opponentMoves = p.getMoves();
-            if (opponentMoves.isEmpty()) {
-                return new Move("Struggle", 10, 0, 100, 0);
-            }
-            return opponentMoves.get(new Random().nextInt(opponentMoves.size()));
-        }
-        return null;
-    }
-
     private void updateUI() {
         if (player.getCurrentPlant() != null) {
             Plant p1 = player.getCurrentPlant();
@@ -252,7 +241,7 @@ public class BattleActivity extends AppCompatActivity {
             hpBarPlayer.setMax(p1.getMaxHealth());
             hpBarPlayer.setProgress(p1.getCurrentHealth());
         }
-        
+
         if (opponent.getCurrentPlant() != null) {
             Plant p2 = opponent.getCurrentPlant();
             tvOpponentUsername.setText(opponent.getUsername());
@@ -261,7 +250,7 @@ public class BattleActivity extends AppCompatActivity {
             hpBarOpponent.setMax(p2.getMaxHealth());
             hpBarOpponent.setProgress(p2.getCurrentHealth());
         }
-        
+
         if (showingSpecial) {
             updateSpecialMenuButtons();
         }

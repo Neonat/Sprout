@@ -72,7 +72,6 @@ public class Plant implements Serializable {
     }
 
     // Setters
-    public void setSpeed(int speed) { this.speed = speed; }
     public void setCommonNames(List<String> commonNames) { this.commonNames = commonNames; }
     public void setDescription(String description) { this.description = description; }
     public void setTaxonomy(String taxonomy) { this.taxonomy = taxonomy; }
@@ -82,7 +81,6 @@ public class Plant implements Serializable {
     public void setCulturalSignificance(String culturalSignificance) { this.culturalSignificance = culturalSignificance; }
     public void setToxicity(String toxicity) { this.toxicity = toxicity; }
     public void setBestWatering(String bestWatering) { this.bestWatering = bestWatering; }
-    public void setScanDateTime(Date scanDateTime) { this.scanDateTime = scanDateTime; }
 
     // Getters
     public UUID getId() { return id; }
@@ -91,21 +89,20 @@ public class Plant implements Serializable {
     public List<Move> getMoves() { return moves; }
     public int getMaxHealth() { return maxHealth; }
     public int getCurrentHealth() { return currentHealth; }
-    public void setCurrentHealth(int health) { this.currentHealth = health; }
+    public void setCurrentHealth(int health) { 
+        this.currentHealth = Math.min(health, this.maxHealth); 
+    }
     public void takeDamage(int amount) {
         this.currentHealth = Math.max(this.currentHealth - amount, 0);
     }
     public boolean isDead() {
         return currentHealth == 0;
     }
-    
-    public List<String> getCommonNames() { return commonNames; }
+
     public String getDescription() { return description; }
-    public String getTaxonomy() { return taxonomy; }
     public String getBestLightCondition() { return bestLightCondition; }
     public String getBestSoilType() { return bestSoilType; }
     public String getCommonUses() { return commonUses; }
-    public String getCulturalSignificance() { return culturalSignificance; }
     public String getToxicity() { return toxicity; }
     public String getBestWatering() { return bestWatering; }
     public Date getScanDateTime() { return scanDateTime; }
@@ -113,5 +110,11 @@ public class Plant implements Serializable {
     public String getSpritePath() { return spritePath; }
 
     public void addMove(Move move) { this.moves.add(move); }
-    public void deleteMove(Move move) { this.moves.remove(move); }
+
+    public String getTaxonomy() { return taxonomy; 
+    }
+
+    public void setScanDateTime(Date scanDateTime) {
+        this.scanDateTime = scanDateTime;
+    }
 }

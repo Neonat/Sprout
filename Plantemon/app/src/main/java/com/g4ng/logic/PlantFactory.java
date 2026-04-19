@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class PlantFactory {
 
@@ -22,7 +23,10 @@ public class PlantFactory {
         if (data.has("error")) return null;
 
         String name = data.optString("name", "Unknown Plant");
-        Plant plant = new Plant(name, 10, spritePath); // todo: decide how to handle speed
+        
+        // Generate a random speed between 5 and 20 for every plant
+        int randomSpeed = new Random().nextInt(16) + 5; 
+        Plant plant = new Plant(name, randomSpeed, spritePath);
 
         JSONArray commonNamesJson = data.optJSONArray("common_names");
         if (commonNamesJson != null) {
@@ -49,12 +53,21 @@ public class PlantFactory {
         // i.e. .read(InputStream) has already been called for both of them
         var taxonomyBase = TaxonomyMoveMapBase.getInstance();
         var moveBase = MoveBase.getInstance().getData();
+                    // moveBase will look something like this:
+            /*
+            Key        Value
+            0         Move("Photosynthesis", 0, 15, 100)
+            1         Move("Tropical Spore", 12, 5, 85)
+            2         Move("Humidity Veil", 5, 20, 100)
+             */
 
-        var moveIds = taxonomyBase.getMoves(new Taxonomy(taxonomy));
+        var moveIds = taxonomyBase.getMoves(new Taxonomy(taxonomy)); // returns an array of moveIds
+        // like this {[1, 3, 5, 8, 14, 15]}
         ArrayList<Integer> moveIdsCopy = new ArrayList<>(moveIds);
         Collections.shuffle(moveIdsCopy);
-        for (int i = 0; i < 4; i++) {
-            var move = moveBase.get(moveIdsCopy.get(i));
+        for (int i = 0; i < 4; i++) { // this logic guarantees a plant will always have 4 moves
+            var move = moveBase.get(moveIdsCopy.get(i)); // eg. first i after shuffling is 1,
+            // then the move will be Move("Tropical Spore", 12, 5, 85)
             Log.i(TAG, "createFromApi: " + plant.getName() + " has move " + move.getName());
             plant.addMove(move);
         }

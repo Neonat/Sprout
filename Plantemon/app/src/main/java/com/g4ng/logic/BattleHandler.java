@@ -58,17 +58,21 @@ public class BattleHandler {
                 Log.i(TAG, "advanceState: Waiting for P1");
                 if (p1SelectedAction == null) {
                     // Ask P1's controller for a move
-                    p1Controller.requestAction(this, player1);
+                    p1Controller.requestAction(this, player1); // using interfaces,
+                    // guaranteed that all controller objects have the requestAction method
+                    // currently a message gets sent to the Log showing that the controller is waiting
+                    // for human input
                 } else {
                     Log.i(TAG, "advanceState: P1 Moved");
                     state = BattleState.P2_MOVE;
+                    advanceState();
                 }
                 break;
 
             case P2_MOVE:
                 Log.i(TAG, "advanceState: Waiting for P2");
                 if (p2SelectedAction == null) {
-                    // Ask P2's controller for a move
+                    // Ask P2's controller (BotController object) for a move
                     p2Controller.requestAction(this, player2);
                 } else {
                     Log.i(TAG, "advanceState: P2 Moved");
@@ -87,19 +91,20 @@ public class BattleHandler {
         }
     }
     public List<String> getLatestTurnResults() {
+        // this method is used in BattleActivity to update the UI after every turn in tvBattleLog
         return turnResults;
     }
 
     public void processTurn() {
         turnResults.clear();
-        Plant p1 = player1.getCurrentPlant();
-        Plant p2 = player2.getCurrentPlant();
+        Plant plant1 = player1.getCurrentPlant();
+        Plant plant2 = player2.getCurrentPlant();
 
-        if (p1.getSpeed() >= p2.getSpeed()) {
-            turnResults.add("--- " + p1.getName() + " is faster! ---");
+        if (plant1.getSpeed() >= plant2.getSpeed()) {
+            turnResults.add("--- " + player1.getUsername() + "'s " + plant1.getName() + " is faster! ---");
             executeSequence(p1SelectedAction, p2SelectedAction, player1, player2);
         } else {
-            turnResults.add("--- " + p2.getName() + " is faster! ---");
+            turnResults.add("--- " + player2.getUsername() + "'s " + plant2.getName() + " is faster! ---");
             executeSequence(p2SelectedAction, p1SelectedAction, player2, player1);
         }
 
@@ -107,10 +112,10 @@ public class BattleHandler {
     }
 
     public void updatePlayers(){
-        System.out.println("Status Update:");
-        System.out.println(player1.getUsername() + "'s " + player1.getCurrentPlant().getName() +
+        Log.i(TAG, "Status Update:");
+        Log.i(TAG, player1.getUsername() + "'s " + player1.getCurrentPlant().getName() +
                 ": " + player1.getCurrentPlant().getCurrentHealth() + " HP");
-        System.out.println(player2.getUsername() + "'s " + player2.getCurrentPlant().getName() +
+        Log.i(TAG, player2.getUsername() + "'s " + player2.getCurrentPlant().getName() +
                 ": " + player2.getCurrentPlant().getCurrentHealth() + " HP");
     }
 
@@ -159,4 +164,3 @@ public class BattleHandler {
         return state;
     }
 }
-

@@ -79,8 +79,7 @@ public class MoveBaseTest {
         Map<Integer, Move> data = moveBase.getData();
         Move move = data.get(4);
         assertNotNull(move);
-        // accuracy and power are missing in the current moves.json, so they should default to 0
+        // accuracy is missing in the current moves.json, so it should default to 0
         assertEquals(0, move.getAccuracy());
-        assertEquals(0, move.getPower());
     }
 }

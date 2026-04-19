@@ -14,13 +14,13 @@ import java.util.List;
 public class BattleLogicTest {
     private Player p1;
     private Player p2;
-    private LocalBattleHandler battleHandler;
+    private BattleHandler battleHandler;
 
     @Before
     public void setUp() {
-        // Create moves with new signature: Move(name, attack, defense, accuracy, power)
-        Move tackle = new Move("Tackle", 20, 10, 100, 0);
-        Move vineWhip = new Move("Vine Whip", 25, 5, 90, 0);
+        // Create moves with new signature: Move(name, attack, defense, accuracy)
+        Move tackle = new Move("Tackle", 20, 10, 100);
+        Move vineWhip = new Move("Vine Whip", 25, 5, 90);
         
         // Create plants for P1
         // speed: Bulbasaur(50), Oddish(30)
@@ -52,7 +52,7 @@ public class BattleLogicTest {
         p1.setCurrentPlant(p1.getGarden().get(0));
         p2.setCurrentPlant(p2.getGarden().get(0));
 
-        battleHandler = new LocalBattleHandler(p1, p2);
+        battleHandler = new BattleHandler(p1, p2, new HumanController(), new HumanController());
     }
 
     @Test
@@ -82,17 +82,22 @@ public class BattleLogicTest {
         System.out.println("Stage 1: Inflicting 50 damage to Ash's Bulbasaur");
         p1.getCurrentPlant().takeDamage(50);
         int healthBefore = p1.getCurrentPlant().getCurrentHealth();
+        System.out.println("Ash's " + p1.getCurrentPlant().getName() + " has " + healthBefore + " HP.");
         
-        System.out.println("Stage 2: Ash uses HealAction(30), Gary waits");
+        System.out.println("Stage 2: Ash uses HealAction, Gary waits");
         HealAction heal = new HealAction();
-        // heal by 20% + 10hp
-        battleHandler.applyAction(p1, heal);
-        // take 1hp damage
-        battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100, 0)); // P2 does nothing
+        // Calculation: (100 * 0.2) + 10 = 30 HP
         
-        assertTrue(p1.getCurrentPlant().getCurrentHealth() > healthBefore);
-        assertEquals(healthBefore + 29, p1.getCurrentPlant().getCurrentHealth());
-        System.out.println("Result: Health increased by exactly 29.");
+        // In the real app, useHeal is called in the UI. 
+        // We simulate that here to maintain consistency with the Player's resource logic.
+        p1.useHeal();  // remainingheal shd decrease
+        battleHandler.applyAction(p1, heal);
+        battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100)); // P2 does nothing
+        
+        int healthAfter = p1.getCurrentPlant().getCurrentHealth();
+        assertTrue(healthAfter > healthBefore);
+        assertEquals(healthBefore + 30, healthAfter);
+        System.out.println("Result: Health increased by exactly 30 HP.");
     }
     
     @Test
@@ -106,8 +111,8 @@ public class BattleLogicTest {
         
         System.out.println("Stage 2: Ash uses Hyper Beam to faint Gary's active plant (Caterpie)");
         // P1 uses a powerful move to kill P2's active plant (Caterpie)
-        battleHandler.applyAction(p1, new Move("Hyper Beam", 100, 0, 100, 0));
-        battleHandler.applyAction(p2, new Move("Tackle", 20, 10, 100, 0));
+        battleHandler.applyAction(p1, new Move("Hyper Beam", 100, 0, 100));
+        battleHandler.applyAction(p2, new Move("Tackle", 20, 10, 100));
         
         // Let's kill the second one too.
         if (battleHandler.getState() != BattleState.END) {
@@ -115,8 +120,8 @@ public class BattleLogicTest {
             // Gary switches to Weedle
             p2.setCurrentPlant(p2.getGarden().get(1)); 
             System.out.println("Stage 4: Ash uses Hyper Beam to faint Weedle");
-            battleHandler.applyAction(p1, new Move("Hyper Beam", 100, 0, 100, 0));
-            battleHandler.applyAction(p2, new Move("Tackle", 20, 10, 100, 0));
+            battleHandler.applyAction(p1, new Move("Hyper Beam", 100, 0, 100));
+            battleHandler.applyAction(p2, new Move("Tackle", 20, 10, 100));
         }
         
         assertEquals(BattleState.END, battleHandler.getState());
@@ -140,7 +145,7 @@ public class BattleLogicTest {
         SwitchAction switchAction = new SwitchAction(nextPlant);
         
         battleHandler.applyAction(p1, switchAction);
-        battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100, 0));
+        battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100));
         
         assertEquals(nextPlant, p1.getCurrentPlant());
         assertNotEquals(initialPlant, p1.getCurrentPlant());
@@ -155,10 +160,10 @@ public class BattleLogicTest {
         
         System.out.println("Stage 1: Ash uses a move with 0% accuracy");
         // Move with 0 accuracy should always miss
-        Move missMove = new Move("Missy", 50, 0, 0, 0);
+        Move missMove = new Move("Missy", 50, 0, 0);
         
         battleHandler.applyAction(p1, missMove);
-        battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100, 0));
+        battleHandler.applyAction(p2, new Move("Wait", 0, 0, 100));
         
         assertEquals(initialHealth, target.getCurrentHealth());
         System.out.println("Result: Gary's " + target.getName() + " took no damage.");

@@ -70,7 +70,8 @@ public class InfoActivity extends AppCompatActivity {
         for (Move move : plant.getMoves()) {
             movesList.append("• ").append(move.getName())
                     .append(" (Atk: ").append(move.getAttack())
-                    .append(", Def: ").append(move.getDefense()).append(")\n");
+                    .append(", Def: ").append(move.getDefense())
+            .append(", Acc: ").append(move.getAccuracy()).append(")\n");
         }
         tvMoves.setText(movesList.length() > 0 ? movesList.toString() : "No moves learned.");
 

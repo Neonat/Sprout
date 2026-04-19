@@ -3,11 +3,14 @@ package com.g4ng.model;
 import java.util.List;
 
 public class Player {
+    // Conceptually, heals belong to the Player resource pool
+    private static final int MAX_HEALS = 3;
+    
     protected final String username;
     protected final List<Plant> garden;
     protected Plant currentPlant;
 
-    private int remainingHeals = 3;
+    private int remainingHeals = MAX_HEALS;
 
     public Player(String username, List<Plant> garden) {
         this.username = username;
@@ -35,11 +38,13 @@ public class Player {
     }
 
     public void useHeal(){
-        remainingHeals--;
+        if (remainingHeals > 0) {
+            remainingHeals--;
+        }
     }
 
     public void resetHeals(){
-        remainingHeals = 3;
+        remainingHeals = MAX_HEALS;
     }
 
     public void restoreGarden() {
