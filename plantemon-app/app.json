@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Plantemon",
+    "slug": "plantemon",
+    "scheme": "plantemon",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.g4ng.plantemon",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Plantemon needs the camera to scan plants."
+      }
+    },
+    "android": {
+      "package": "com.g4ng.plantemon",
+      "adaptiveIcon": {
+        "backgroundColor": "#1F3D2B"
+      },
+      "permissions": ["CAMERA"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        { "cameraPermission": "Allow Plantemon to use the camera to scan plants." }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": { "origin": false }
+    }
+  }
+}
