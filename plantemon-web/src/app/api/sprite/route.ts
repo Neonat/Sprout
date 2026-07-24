@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { resolveKeys, serverEnv } from "@/lib/server/env";
+import { cleanupSprite } from "@/lib/server/sprite-cleanup";
 
 export const runtime = "nodejs";
 /*
@@ -85,7 +86,8 @@ export async function POST(request: Request) {
     const prompt = await describeAsSprite(base64Image, plantName, keys.gemmaApiKey);
     const rendered = await renderSprite(prompt, keys.fluxApiKey);
     // Enhancement, not a hard step: on any failure keep the raw render.
-    const spriteBase64 = await removeBackground(rendered, serverEnv.withoutbgKey);
+    const cutout = await removeBackground(rendered, serverEnv.withoutbgKey);
+    const spriteBase64 = await cleanupSpriteSafe(cutout);
     return NextResponse.json({ sprite: `data:image/png;base64,${spriteBase64}`, prompt });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -107,8 +109,9 @@ async function describeAsSprite(
     "touch of life: one small pair of simple dot or bead eyes tucked among its leaves or " +
     "flowers. Do NOT add a mouth, arms, legs, or a separate body, and do NOT turn it into " +
     "a character or mascot — it stays a plant that just happens to have tiny eyes. " +
-    "Front-facing and centered on a plain flat background. Keep it to 2 sentences and " +
-    "output only the prompt, with no preamble.";
+    "Front-facing and centered, fully isolated on a solid flat pure-white background — " +
+    "no scenery, pot, ground, gradient, shadow, or reflection, so it cuts out cleanly. " +
+    "Keep it to 2 sentences and output only the prompt, with no preamble.";
 
   const response = await fetch(NVIDIA_ENDPOINT, {
     method: "POST",
@@ -174,39 +177,70 @@ async function renderSprite(prompt: string, apiKey: string): Promise<string> {
 const WITHOUTBG_ENDPOINT = "https://api.withoutbg.com/v1.0/image-without-background-base64";
 
 /**
- * Runs the render through withoutBG to get a true RGBA cutout.
+ * Removes stray islands and downscales, never fatally: if sharp errors, the
+ * un-cleaned cutout is returned so a scan never fails on the polish step.
+ */
+async function cleanupSpriteSafe(base64Png: string): Promise<string> {
+  try {
+    return await cleanupSprite(base64Png);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.warn(`Sprite cleanup failed, keeping the raw cutout: ${message}`);
+    return base64Png;
+  }
+}
+
+/** HTTP statuses that won't change on retry — a bad key or no credit. */
+const WITHOUTBG_PERMANENT = new Set([401, 402, 403, 413, 415, 422]);
+
+/**
+ * Runs the render through withoutBG to get a true RGBA cutout, retrying
+ * transient failures so an occasional network blip or 500 doesn't leave a
+ * sprite with its background baked in.
  *
- * Deliberately non-fatal: a missing key, exhausted credits, or an API error
- * returns the original render unchanged rather than failing the whole scan.
- * Billed one credit per successful call — cheap because sprites are cached by
- * species, so each plant type only pays once.
+ * Deliberately non-fatal overall: once retries are exhausted (or the key is
+ * missing / credits are gone) it returns the raw render rather than failing the
+ * whole scan. Billed one credit per successful call — cheap because sprites are
+ * cached by species, so each plant type only pays once.
  */
 async function removeBackground(base64Png: string, apiKey: string | null): Promise<string> {
   if (!apiKey) return base64Png; // key not configured — skip the step
 
-  try {
-    const response = await fetch(WITHOUTBG_ENDPOINT, {
-      method: "POST",
-      headers: { "X-API-Key": apiKey, "Content-Type": "application/json" },
-      body: JSON.stringify({ image_base64: base64Png }),
-      signal: AbortSignal.timeout(30_000),
-    });
+  const MAX_ATTEMPTS = 3;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(WITHOUTBG_ENDPOINT, {
+        method: "POST",
+        headers: { "X-API-Key": apiKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ image_base64: base64Png }),
+        // Normally ~3-4s; a short cap keeps 3 attempts from stacking into a
+        // function timeout when the API is hanging.
+        signal: AbortSignal.timeout(15_000),
+      });
 
-    if (!response.ok) {
-      const detail = await response.text();
-      console.warn(`withoutBG error ${response.status}, keeping raw sprite: ${detail.slice(0, 200)}`);
-      return base64Png;
+      if (response.ok) {
+        const cutout = (await response.json())?.img_without_background_base64;
+        if (typeof cutout === "string" && cutout.length > 0) return cutout;
+        console.warn("withoutBG returned no cutout, keeping raw sprite.");
+        return base64Png;
+      }
+
+      const detail = (await response.text()).slice(0, 200);
+      // A bad key or exhausted credit won't recover on retry — stop early.
+      if (WITHOUTBG_PERMANENT.has(response.status)) {
+        console.error(`withoutBG ${response.status} (not retryable): ${detail}`);
+        return base64Png;
+      }
+      console.warn(`withoutBG ${response.status}, attempt ${attempt}/${MAX_ATTEMPTS}: ${detail}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.warn(`withoutBG request failed, attempt ${attempt}/${MAX_ATTEMPTS}: ${message}`);
     }
 
-    const cutout = (await response.json())?.img_without_background_base64;
-    if (typeof cutout !== "string" || cutout.length === 0) {
-      console.warn("withoutBG returned no cutout, keeping raw sprite.");
-      return base64Png;
-    }
-    return cutout;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.warn(`withoutBG request failed, keeping raw sprite: ${message}`);
-    return base64Png;
+    // Brief backoff before the next try.
+    if (attempt < MAX_ATTEMPTS) await new Promise((r) => setTimeout(r, 400 * attempt));
   }
+
+  console.warn("withoutBG exhausted retries, keeping raw sprite.");
+  return base64Png;
 }

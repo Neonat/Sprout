@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { BackButton } from "@/components/back-button";
@@ -27,7 +28,7 @@ type Status =
   | { kind: "idle" }
   | { kind: "busy"; step: ScanStep; plantName?: string; usingPhoto?: boolean }
   | { kind: "naming"; photo: string }
-  | { kind: "done"; sprite: string; name: string }
+  | { kind: "done"; sprite: string; name: string; plantId: string }
   | { kind: "error"; message: string };
 
 export default function ScanPage() {
@@ -119,7 +120,7 @@ export default function ScanPage() {
         const plant = buildPlant(identification, name, sprite);
         await addPlant(plant);
 
-        setStatus({ kind: "done", sprite, name: plant.getName() });
+        setStatus({ kind: "done", sprite, name: plant.getName(), plantId: plant.id });
       } catch (error) {
         setStatus({
           kind: "error",
@@ -150,7 +151,7 @@ export default function ScanPage() {
         const plant = buildPlant(null, name, sprite);
         await addPlant(plant);
 
-        setStatus({ kind: "done", sprite, name: plant.getName() });
+        setStatus({ kind: "done", sprite, name: plant.getName(), plantId: plant.id });
       } catch (error) {
         setStatus({
           kind: "error",
@@ -299,7 +300,8 @@ export default function ScanPage() {
         <ResultDialog
           sprite={status.sprite}
           name={status.name}
-          onDismiss={() => setStatus({ kind: "idle" })}
+          plantId={status.plantId}
+          onScanAnother={() => setStatus({ kind: "idle" })}
         />
       )}
     </main>
@@ -458,12 +460,16 @@ function NameDialog({
 function ResultDialog({
   sprite,
   name,
-  onDismiss,
+  plantId,
+  onScanAnother,
 }: {
   sprite: string;
   name: string;
-  onDismiss: () => void;
+  plantId: string;
+  onScanAnother: () => void;
 }) {
+  const router = useRouter();
+
   return (
     <Overlay>
       <h2 className="text-center text-xs">Done!</h2>
@@ -471,10 +477,20 @@ function ResultDialog({
       <img src={sprite} alt="" className="pixelated mx-auto mt-3 h-40 w-40 object-contain" />
       <p className="mt-2 text-center text-[10px] leading-relaxed">{name}</p>
       <p className="mt-1 text-center text-[8px] opacity-70">Added to your garden.</p>
+
+      {/* Primary action: jump straight to the new plant's card. */}
       <button
         type="button"
-        onClick={onDismiss}
+        onClick={() => router.push(`/garden/${plantId}`)}
+        style={{ background: "var(--color-plantemon-hp-high)", color: "#fff" }}
         className="press pixel-button mt-4 w-full px-2 py-2 text-[9px]"
+      >
+        View plant
+      </button>
+      <button
+        type="button"
+        onClick={onScanAnother}
+        className="press pixel-button mt-2 w-full px-2 py-2 text-[9px]"
       >
         Scan another
       </button>
