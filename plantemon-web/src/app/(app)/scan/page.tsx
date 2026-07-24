@@ -512,7 +512,7 @@ function ResultDialog({
       <button
         type="button"
         onClick={() => router.push(`/garden/${plantId}`)}
-        style={{ background: "var(--color-plantemon-hp-high)", color: "#fff" }}
+        style={{ background: "var(--color-hp-high)", color: "#fff" }}
         className="press pixel-button mt-4 w-full px-2 py-2 text-[9px]"
       >
         View plant

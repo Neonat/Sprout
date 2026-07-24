@@ -58,7 +58,7 @@ export default function GardenPage() {
             aria-label={shovelling ? "Stop shovelling" : "Remove plants"}
             onClick={() => setShovelArmed((on) => !on)}
             // Inline background wins over .pixel-button's unlayered shorthand.
-            style={shovelling ? { background: "var(--color-plantemon-hp-low)" } : undefined}
+            style={shovelling ? { background: "var(--color-hp-low)" } : undefined}
             className="press pixel-button flex h-10 w-10 items-center justify-center text-lg"
           >
             🪏
@@ -247,7 +247,7 @@ function RemoveDialog({
             type="button"
             disabled={busy}
             onClick={onConfirm}
-            style={{ background: "var(--color-plantemon-hp-low)", color: "#fff" }}
+            style={{ background: "var(--color-hp-low)", color: "#fff" }}
             className="press pixel-button flex-1 px-2 py-2 text-[9px]"
           >
             {busy ? "Digging…" : "Dig up"}
