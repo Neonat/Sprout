@@ -50,21 +50,21 @@ function PlantCard({ plant }: { plant: Plant }) {
   return (
     <div className="safe-bottom flex-1 overflow-y-auto px-4 pb-8">
       <div className="flex flex-col items-center">
-        {plant.spritePath ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={plant.spritePath}
-            alt=""
-            className="pixelated h-40 w-40 object-contain"
-          />
-        ) : (
-          <Image src="/img/ic_pot_empty.png" alt="" width={160} height={160} className="h-40 w-40" />
-        )}
+        {/* Boxed so the sprite reads against the busy painted background. */}
+        <div className="pixel-panel p-2">
+          {plant.spritePath ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={plant.spritePath} alt="" className="pixelated h-36 w-36 object-contain" />
+          ) : (
+            <Image src="/img/ic_pot_empty.png" alt="" width={144} height={144} className="h-36 w-36" />
+          )}
+        </div>
 
-        <h1 className="font-pixel mt-2 text-center text-base leading-relaxed sm:text-xl">
-          {plant.getName()}
-        </h1>
-        <p className="mt-2 text-xs opacity-80">Scanned on: {formatScanTime(scannedAt)}</p>
+        {/* Name + scan time in their own panel, likewise. */}
+        <div className="pixel-panel mt-3 px-4 py-2 text-center">
+          <h1 className="font-pixel text-base leading-relaxed sm:text-xl">{plant.getName()}</h1>
+          <p className="mt-2 text-xs opacity-80">Scanned on: {formatScanTime(scannedAt)}</p>
+        </div>
       </div>
 
       <div className="mt-4 flex justify-center gap-3">

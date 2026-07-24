@@ -39,7 +39,11 @@ export default function ScanPage() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Two inputs: uploadInput picks from the gallery/files (no capture); the
+  // camera ring falls back to cameraInput (capture) when the live preview isn't
+  // available, which opens the native camera on a phone.
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   // Guards against overlapping runs, like ScanActivity's AtomicBoolean.
   const processingRef = useRef(false);
 
@@ -165,8 +169,12 @@ export default function ScanPage() {
   );
 
   const onCapture = useCallback(() => {
-    if (!videoRef.current || !cameraReady) return;
-    void runPipeline(captureFrame(videoRef.current));
+    // Live preview available: grab a frame. Otherwise open the native camera.
+    if (cameraReady && videoRef.current) {
+      void runPipeline(captureFrame(videoRef.current));
+    } else {
+      cameraInputRef.current?.click();
+    }
   }, [cameraReady, runPipeline]);
 
   const onFilePicked = useCallback(
@@ -192,7 +200,15 @@ export default function ScanPage() {
   const busy = status.kind === "busy";
 
   return (
-    <main className="screen flex flex-col bg-black">
+    <main className="screen flex flex-col">
+      {/*
+        Black backdrop at the very back. It must NOT live as `bg-black` on
+        <main>: main doesn't form a stacking context, so a -z-10 video would
+        paint *behind* main's own background and show as a black screen. A
+        separate -z-20 layer sits behind the video instead.
+      */}
+      <div className="absolute inset-0 -z-20 bg-black" />
+
       {/* Live preview, or the painted background when unavailable */}
       {cameraReady ? (
         <video
@@ -200,6 +216,7 @@ export default function ScanPage() {
           autoPlay
           playsInline
           muted
+          onLoadedMetadata={(e) => void e.currentTarget.play().catch(() => {})}
           className="absolute inset-0 -z-10 h-full w-full object-cover"
         />
       ) : (
@@ -247,7 +264,7 @@ export default function ScanPage() {
         <button
           type="button"
           disabled={busy || gardenFull}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => uploadInputRef.current?.click()}
           className="press pixel-button px-3 py-2 text-[9px] disabled:cursor-not-allowed"
         >
           Upload
@@ -256,7 +273,7 @@ export default function ScanPage() {
         <button
           type="button"
           aria-label="Capture photo"
-          disabled={busy || gardenFull || !cameraReady}
+          disabled={busy || gardenFull}
           onClick={onCapture}
           className="press flex h-20 w-20 items-center justify-center rounded-full border-4 border-white disabled:opacity-40"
         >
@@ -273,12 +290,25 @@ export default function ScanPage() {
         </button>
       </div>
 
+      {/* Upload: gallery / files. No `capture`, so it does NOT launch the camera. */}
+      <input
+        ref={uploadInputRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(event) => {
+          void onFilePicked(event.target.files?.[0]);
+          event.target.value = "";
+        }}
+      />
+
       {/*
-        capture="environment" asks the OS for the rear camera directly. This is
-        the dependable path on iOS, where getUserMedia can be unavailable.
+        Camera fallback for the capture ring. capture="environment" asks the OS
+        for the rear camera directly — the dependable path on a phone when the
+        live getUserMedia preview isn't available.
       */}
       <input
-        ref={fileInputRef}
+        ref={cameraInputRef}
         type="file"
         accept="image/*"
         capture="environment"
