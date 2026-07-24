@@ -1,0 +1,247 @@
+@import "tailwindcss";
+
+/*
+ * Ports the Android theme: Press Start 2P for chrome, full-bleed painted
+ * backgrounds, chunky pixel buttons.
+ */
+@font-face {
+  font-family: "Press Start 2P";
+  src: url("/font/press_start_2p.ttf") format("truetype");
+  font-display: swap;
+}
+
+@theme {
+  --font-pixel: "Press Start 2P", monospace;
+  /* Readable stack for paragraphs; Press Start 2P is display-only. */
+  --font-body: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+
+  /*
+   * Sprout brand green, sampled from the logo card. The single brand colour the
+   * hub composes against — scrim, panel borders, and the PWA theme colour.
+   */
+  --color-sprout: #203727;
+
+  /* Carried over from values/colors.xml */
+  --color-plantemon-primary: #6200ee;
+  --color-plantemon-primary-dark: #3700b3;
+  --color-plantemon-secondary: #03dac5;
+  --color-hp-high: #4caf50;
+  --color-hp-mid: #ffc107;
+  --color-hp-low: #f44336;
+}
+
+:root {
+  /*
+   * This is a fixed-palette game — painted backgrounds and white panels — not
+   * a document that should invert in dark mode. Pinning to `light` stops the
+   * browser from defaulting text, form controls, and scrollbars to white on a
+   * dark-mode device, which was rendering dark text as white-on-white in the
+   * white panels.
+   */
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+  /* Stops the rubber-band scroll that makes a PWA feel like a web page. */
+  overscroll-behavior-y: none;
+}
+
+body {
+  margin: 0;
+  /* Body defaults to the readable font; opt into pixel with .font-pixel. */
+  font-family: var(--font-body);
+  /* Explicit dark default, so text never inherits a white system colour. */
+  color: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Press Start 2P — for headings, labels, buttons, and other short chrome. */
+.font-pixel {
+  font-family: var(--font-pixel);
+  letter-spacing: -0.04em;
+}
+
+/* Dense copy: readable font, comfortable line height. */
+.font-body {
+  font-family: var(--font-body);
+  letter-spacing: normal;
+}
+
+/* Sprites and painted assets scale as pixel art, never blurred. */
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/*
+ * Fills the viewport including the area behind the iOS notch and home
+ * indicator. dvh rather than vh, so Safari's collapsing toolbar does not
+ * leave a gap at the bottom.
+ */
+.screen {
+  position: relative;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/*
+ * Opt a .screen out of clipping. The game screens are each built to fit
+ * exactly, but the home hub stacks real content, so a short viewport or an
+ * enlarged system font must be able to scroll rather than lose the last tile.
+ */
+.screen-scrollable {
+  overflow-y: auto;
+}
+
+.safe-top {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Matches MainActivity.pressAnim: scale to 0.90 over 80ms while held. */
+.press {
+  transition: transform 80ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.press:active {
+  transform: scale(0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press,
+  .press:active {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Chunky pixel button, standing in for Widget.App.Button. */
+.pixel-button {
+  font-family: var(--font-pixel);
+  letter-spacing: -0.04em;
+  border: 3px solid #1a1a1a;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.45);
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+.pixel-button:disabled {
+  opacity: 0.45;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.pixel-panel {
+  border: 3px solid #1a1a1a;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.94);
+  /* Always a light panel, so pin dark text regardless of system scheme. */
+  color: #1a1a1a;
+}
+
+/*
+ * Brand-tinted panel, for the Sprout-branded hub only. A modifier rather than a
+ * change to .pixel-panel, so the other screens keep the near-black chrome the
+ * Android theme gave them.
+ */
+.pixel-panel-brand {
+  border-color: #203727;
+  box-shadow: 4px 4px 0 rgba(32, 55, 39, 0.45);
+  color: #203727;
+}
+
+/*
+ * Panel for the marketing page, which sits on the dark brand green rather than
+ * on painted art. Same chunky border and hard shadow as .pixel-panel, inverted
+ * so it reads as a raised card on a dark field instead of a white sticker.
+ */
+.pixel-panel-dark {
+  border: 3px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+/*
+ * Soft drop shadow for copy set over the painted art. .text-outline's hard
+ * 2px halo suits Press Start 2P, but on the rounded body font it reads as a
+ * black smear, so brand copy uses this instead.
+ */
+.text-soft-shadow {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.55),
+    0 2px 10px rgba(32, 55, 39, 0.75);
+}
+
+/* Outlined label text, so white copy stays legible over painted art. */
+.text-outline {
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000;
+}
+
+/*
+ * Wiggle for plants that are targetable while shovelling — the "jiggling icons"
+ * cue that a delete mode is armed.
+ */
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+.wiggle {
+  animation: wiggle 0.35s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wiggle {
+    animation: none;
+  }
+}
+
+/* Spinner for the active step in the scan progress overlay. */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+/* Gentle pulse for the label under the active step. */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin,
+  .pulse-soft {
+    animation: none;
+  }
+}

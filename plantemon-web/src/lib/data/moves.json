@@ -1,0 +1,149 @@
+[
+    {
+        "id": 0,
+        "name": "Photosynthesis",
+        "attack": 0,
+        "defense": 15,
+        "accuracy": 100
+    },
+    {
+        "id": 1,
+        "name": "Tropical Spore",
+        "attack": 12,
+        "defense": 5,
+        "accuracy": 85
+    },
+    {
+        "id": 2,
+        "name": "Humidity Veil",
+        "attack": 5,
+        "defense": 20,
+        "accuracy": 100
+    },
+    {
+        "id": 3,
+        "name": "Monsoon Lash",
+        "attack": 25,
+        "defense": 0,
+        "accuracy": 70
+    },
+    {
+        "id": 4,
+        "name": "Solar Bloom",
+        "attack": 3,
+        "defense": 5,
+        "accuracy": 100
+    },
+    {
+        "id": 5,
+        "name": "Aerial Root Whip",
+        "attack": 6,
+        "defense": 0,
+        "accuracy": 100
+    },
+    {
+        "id": 6,
+        "name": "Tropical Resilience",
+        "attack": 1,
+        "defense": 12,
+        "accuracy": 100
+    },
+    {
+        "id": 7,
+        "name": "Petal Glare",
+        "attack": 10,
+        "defense": -3,
+        "accuracy": 90
+    },
+    {
+        "id": 8,
+        "name": "Hidden Thorn",
+        "attack": 15,
+        "defense": -5,
+        "accuracy": 80
+    },
+    {
+        "id": 11,
+        "name": "Papery Illusion",
+        "attack": 1,
+        "defense": 10,
+        "accuracy": 100
+    },
+    {
+        "id": 9,
+        "name": "Bramble Tangle",
+        "attack": 7,
+        "defense": 2,
+        "accuracy": 95
+    },
+    {
+        "id": 10,
+        "name": "Crimson Cascade",
+        "attack": 9,
+        "defense": -1,
+        "accuracy": 90
+    },
+    {
+        "id": 12,
+        "name": "Surface Smother",
+        "attack": 1,
+        "defense": 10,
+        "accuracy": 100
+    },
+    {
+        "id": 13,
+        "name": "Pond Skim",
+        "attack": 6,
+        "defense": 4,
+        "accuracy": 100
+    },
+    {
+        "id": 14,
+        "name": "Oxygen Drain",
+        "attack": 8,
+        "defense": -1,
+        "accuracy": 95
+    },
+    {
+        "id": 15,
+        "name": "Swarm Division",
+        "attack": 4,
+        "defense": 6,
+        "accuracy": 100
+    },
+    {
+        "id": 16,
+        "name": "Dawn Constriction",
+        "attack": 8,
+        "defense": -1,
+        "accuracy": 95
+    },
+    {
+        "id": 17,
+        "name": "Early Awakening",
+        "attack": 5,
+        "defense": 5,
+        "accuracy": 100
+    },
+    {
+        "id": 18,
+        "name": "Trumpet Resonance",
+        "attack": 11,
+        "defense": -3,
+        "accuracy": 85
+    },
+    {
+        "id": 19,
+        "name": "Spiral Bind",
+        "attack": 2,
+        "defense": 8,
+        "accuracy": 100
+    },
+    {
+        "id": 20,
+        "name": "Amber Entrapment",
+        "attack": 14,
+        "defense": 8,
+        "accuracy": 75
+    }
+]
