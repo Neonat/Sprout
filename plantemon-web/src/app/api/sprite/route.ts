@@ -5,12 +5,54 @@ import { cleanupSprite } from "@/lib/server/sprite-cleanup";
 
 export const runtime = "nodejs";
 /*
- * Measured end-to-end against the live APIs: vision ~12-25s, Flux ~3.5s, and
- * the withoutBG cutout ~3.3s — worst case around 32s. That fits inside Vercel's
- * 60s Hobby cap, so 55s is set deliberately — the request fails just under the
- * platform limit with our own error rather than being killed mid-flight.
+ * The vision hop is far spikier than it first measured. Re-measured against the
+ * live API on 2026-07-25, the same photo and prompt returned in 5.4s, 6.1s,
+ * 7.3s, 14.4s, 19.9s — and 49s. Flux (~3.3s) and withoutBG (~4.3s) are steady,
+ * so the tail is entirely gemma's queue.
+ *
+ * The old 55s cap sat right inside that tail, so a slow vision call took the
+ * whole function down with a 504 and the client silently fell back to a cropped
+ * photo. 120s clears the observed tail with room to spare. Wall-clock here is
+ * nearly free: Fluid Compute bills active CPU, and this route is almost
+ * entirely idle waiting on upstream HTTP.
+ *
+ * The budget below is what actually protects the request — this cap is only the
+ * backstop for a hop that hangs past its own deadline.
  */
-export const maxDuration = 55;
+export const maxDuration = 120;
+
+/**
+ * Wall-clock the route will spend before giving up, kept under maxDuration so
+ * we always answer with our own error instead of being killed mid-flight.
+ */
+const TOTAL_BUDGET_MS = 110_000;
+
+/** Per-hop ceilings, each also clamped to whatever budget is left. */
+const VISION_TIMEOUT_MS = 75_000;
+const FLUX_TIMEOUT_MS = 30_000;
+const WITHOUTBG_TIMEOUT_MS = 15_000;
+
+/**
+ * Tracks the remaining budget so each hop can bound itself by what's actually
+ * left rather than by a fixed timeout that ignores how long the earlier hops
+ * took. The two mandatory hops (vision, Flux) get first claim; the optional
+ * polish hops take what remains and are skipped when it runs out, which
+ * degrades to a slightly rougher sprite instead of losing the whole scan.
+ */
+function createDeadline(totalMs: number) {
+  const expiresAt = Date.now() + totalMs;
+  return {
+    remainingMs: () => expiresAt - Date.now(),
+    /** Timeout signal for one hop: its own ceiling, or less if time is short. */
+    signal(capMs: number, hop: string): AbortSignal {
+      const left = expiresAt - Date.now();
+      if (left <= 0) throw new Error(`Ran out of time before ${hop}.`);
+      return AbortSignal.timeout(Math.min(capMs, left));
+    },
+  };
+}
+
+type Deadline = ReturnType<typeof createDeadline>;
 
 const NVIDIA_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
 
@@ -20,9 +62,10 @@ const NVIDIA_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
  * The Android app used google/gemma-3-27b-it, which NVIDIA retired on
  * 2026-05-12 and now answers with 410 Gone — so the original sprite pipeline
  * fails on every scan today. gemma-4-31b-it is the successor and produces the
- * best prompts of the candidates measured (~13s, but with real variance up to
- * ~25s). meta/llama-3.2-11b-vision-instruct is ~3x faster if latency matters
- * more than prompt quality.
+ * best prompts of the candidates measured, but its latency is the whole reason
+ * this route needs a budget: a ~6s median with a tail out past 49s (see the
+ * maxDuration note above). meta/llama-3.2-11b-vision-instruct is the fallback
+ * if that tail ever matters more than prompt quality.
  *
  * Overridable so the model can be swapped without a redeploy the next time one
  * reaches end of life.
@@ -83,12 +126,13 @@ export async function POST(request: Request) {
   const base64Image = image.startsWith("data:") ? image.slice(image.indexOf(",") + 1) : image;
 
   try {
-    const prompt = await describeAsSprite(base64Image, plantName, keys.gemmaApiKey);
-    const rendered = await renderSprite(prompt, keys.fluxApiKey);
+    const deadline = createDeadline(TOTAL_BUDGET_MS);
+    const prompt = await describeAsSprite(base64Image, plantName, keys.gemmaApiKey, deadline);
+    const rendered = await renderSprite(prompt, keys.fluxApiKey, deadline);
     // Enhancement, not a hard step: on any failure keep the raw render.
-    const cutout = await removeBackground(rendered, serverEnv.withoutbgKey);
+    const cutout = await removeBackground(rendered, serverEnv.withoutbgKey, deadline);
     const spriteBase64 = await cleanupSpriteSafe(cutout);
-    return NextResponse.json({ sprite: `data:image/png;base64,${spriteBase64}`, prompt });
+    return NextResponse.json({ sprite: toDataUrl(spriteBase64), prompt });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Sprite generation failed:", message);
@@ -96,22 +140,58 @@ export async function POST(request: Request) {
   }
 }
 
-/** Port of SpriteGeneratorService.fetchDescription. */
+/**
+ * Builds the sprite data URL, labelled with the format actually present rather
+ * than an assumed one.
+ *
+ * Flux answers with JPEG (magic ffd8ffe0), not PNG. Both later steps re-encode
+ * to real PNG — withoutBG returns a PNG cutout and sharp always writes PNG — so
+ * the happy path genuinely is PNG. But both of those steps are deliberately
+ * non-fatal, and when they fall through together the raw JPEG is what reaches
+ * the client. Sniffing the magic bytes keeps the label honest on every path,
+ * which matters because this data URL is persisted with the plant: a wrong
+ * label is stored for the life of that sprite, not just this response.
+ */
+function toDataUrl(base64: string): string {
+  // 12 base64 chars decode to 9 bytes — enough for either signature.
+  const head = Buffer.from(base64.slice(0, 12), "base64");
+  const isPng = head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47;
+  const isJpeg = head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff;
+  // Unknown falls back to PNG: every path that completes normally ends in PNG.
+  const mime = isJpeg && !isPng ? "image/jpeg" : "image/png";
+  return `data:${mime};base64,${base64}`;
+}
+
+/**
+ * Port of SpriteGeneratorService.fetchDescription, with a different art direction:
+ * the sprite is now an original creature *derived* from the plant rather than the
+ * literal plant with eyes added.
+ *
+ * Two things in the reference look are deliberately dropped, because they'd break
+ * the rest of the pipeline: the graph-paper backdrop (withoutBG needs a flat white
+ * field to cut against) and the 2x2 grid (one plant, one sprite).
+ */
 async function describeAsSprite(
   base64Image: string,
   plantName: string,
   apiKey: string,
+  deadline: Deadline,
 ): Promise<string> {
   const instruction =
-    `This is a photo of ${plantName}. Write an image-generation prompt to draw this exact ` +
-    "plant as a cute retro pixel-art game sprite. It MUST still clearly read as the real " +
-    "plant — keep its true shape, structure, leaves, and colours. Add only the slightest " +
-    "touch of life: one small pair of simple dot or bead eyes tucked among its leaves or " +
-    "flowers. Do NOT add a mouth, arms, legs, or a separate body, and do NOT turn it into " +
-    "a character or mascot — it stays a plant that just happens to have tiny eyes. " +
-    "Front-facing and centered, fully isolated on a solid flat pure-white background — " +
-    "no scenery, pot, ground, gradient, shadow, or reflection, so it cuts out cleanly. " +
-    "Keep it to 2 sentences and output only the prompt, with no preamble.";
+    `This is a photo of ${plantName}. Write an image-generation prompt for an original ` +
+    "pixel-art creature design in the style of a retro monster-collecting video game: a " +
+    "chubby, big-eyed plant/nature-themed monster drawn from this exact plant. Carry the " +
+    "real plant's colours, leaf shapes, and flowers into the creature — its leaves sprout " +
+    "from the sides like wings or curl up like horns, its flowers cluster on its head and " +
+    "body, its stems trail into a curling vine tail — on a round, soft-proportioned body " +
+    "with large expressive eyes, a small friendly face, and tiny clawed or root-like feet. " +
+    "Style: clean bold black outlines, flat cel-shaded colouring, retro 16-bit pixel art, " +
+    "grid-aligned pixels, even lighting, no shadows. Describe only the creature's own " +
+    "design — never name or reference any existing game, brand, or character. " +
+    "One single creature, front-facing and centered, fully isolated on a solid flat " +
+    "pure-white background — no scenery, pot, ground, graph paper or grid backdrop, " +
+    "gradient, shadow, or reflection, so it cuts out cleanly. " +
+    "Keep it to 2-3 sentences and output only the prompt, with no preamble.";
 
   const response = await fetch(NVIDIA_ENDPOINT, {
     method: "POST",
@@ -132,7 +212,7 @@ async function describeAsSprite(
       ],
       max_tokens: 256,
     }),
-    signal: AbortSignal.timeout(60_000),
+    signal: deadline.signal(VISION_TIMEOUT_MS, "the vision step"),
   });
 
   const raw = await response.text();
@@ -148,7 +228,7 @@ async function describeAsSprite(
 }
 
 /** Port of SpriteGeneratorService.fetchSprite. Returns bare base64 PNG. */
-async function renderSprite(prompt: string, apiKey: string): Promise<string> {
+async function renderSprite(prompt: string, apiKey: string, deadline: Deadline): Promise<string> {
   const response = await fetch(FLUX_ENDPOINT, {
     method: "POST",
     headers: {
@@ -156,7 +236,7 @@ async function renderSprite(prompt: string, apiKey: string): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ prompt, steps: 4 }),
-    signal: AbortSignal.timeout(180_000),
+    signal: deadline.signal(FLUX_TIMEOUT_MS, "the render step"),
   });
 
   const raw = await response.text();
@@ -203,11 +283,23 @@ const WITHOUTBG_PERMANENT = new Set([401, 402, 403, 413, 415, 422]);
  * whole scan. Billed one credit per successful call — cheap because sprites are
  * cached by species, so each plant type only pays once.
  */
-async function removeBackground(base64Png: string, apiKey: string | null): Promise<string> {
+async function removeBackground(
+  base64Png: string,
+  apiKey: string | null,
+  deadline: Deadline,
+): Promise<string> {
   if (!apiKey) return base64Png; // key not configured — skip the step
+
+  /* Below this there isn't time for a call plus the sharp pass that follows, so
+   * stop rather than start work that can only end in a timeout. */
+  const MIN_USEFUL_MS = 8_000;
 
   const MAX_ATTEMPTS = 3;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    if (deadline.remainingMs() < MIN_USEFUL_MS) {
+      console.warn("Not enough budget left for withoutBG, keeping raw sprite.");
+      return base64Png;
+    }
     try {
       const response = await fetch(WITHOUTBG_ENDPOINT, {
         method: "POST",
@@ -215,7 +307,7 @@ async function removeBackground(base64Png: string, apiKey: string | null): Promi
         body: JSON.stringify({ image_base64: base64Png }),
         // Normally ~3-4s; a short cap keeps 3 attempts from stacking into a
         // function timeout when the API is hanging.
-        signal: AbortSignal.timeout(15_000),
+        signal: deadline.signal(WITHOUTBG_TIMEOUT_MS, "background removal"),
       });
 
       if (response.ok) {
