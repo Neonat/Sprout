@@ -57,6 +57,17 @@ export const serverEnv = {
     return process.env.FLUX_API_KEY || required("NVIDIA_API_KEY");
   },
   /**
+   * Google AI Studio key for the Gemini vision hop.
+   *
+   * Optional by design: it is the preferred path (measured ~1.5s median against
+   * gemma-4-31b-it's 69s-or-timeout), but when it is absent or its credits run
+   * out the sprite route falls back to the NVIDIA models above. A missing key
+   * therefore costs latency, not a working scan.
+   */
+  get geminiKey() {
+    return process.env.GEMINI_KEY || null;
+  },
+  /**
    * withoutBG background-removal key. Optional: when absent, sprite generation
    * skips the cutout step and returns the raw render, so a missing key degrades
    * rather than failing.

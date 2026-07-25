@@ -5,16 +5,19 @@ import { cleanupSprite } from "@/lib/server/sprite-cleanup";
 
 export const runtime = "nodejs";
 /*
- * The vision hop is far spikier than it first measured. Re-measured against the
- * live API on 2026-07-25, the same photo and prompt returned in 5.4s, 6.1s,
- * 7.3s, 14.4s, 19.9s — and 49s. Flux (~3.3s) and withoutBG (~4.3s) are steady,
- * so the tail is entirely gemma's queue.
+ * On the normal path this route now finishes in about 10s: Gemini ~1.5s, Flux
+ * ~3.3s, withoutBG ~4.3s. The cap is not sized for that path.
  *
- * The old 55s cap sat right inside that tail, so a slow vision call took the
- * whole function down with a 504 and the client silently fell back to a cropped
- * photo. 120s clears the observed tail with room to spare. Wall-clock here is
- * nearly free: Fluid Compute bills active CPU, and this route is almost
- * entirely idle waiting on upstream HTTP.
+ * It is sized for the NVIDIA fallback. gemma-4-31b-it is wildly variable — 5.4s
+ * to 49s in one hour's measurements, and 69s-or-timeout in the next — and the
+ * old 55s cap sat right inside that tail, so a slow vision call took the whole
+ * function down with a 504 and the client silently degraded to a cropped photo.
+ * When Gemini is unavailable we would rather wait out a slow gemma than lose the
+ * sprite, so the cap has to cover it.
+ *
+ * Wall-clock is nearly free here: Fluid Compute bills active CPU, and this route
+ * is almost entirely idle on upstream HTTP, so a generous cap that is rarely
+ * reached costs little.
  *
  * The budget below is what actually protects the request — this cap is only the
  * backstop for a hop that hangs past its own deadline.
@@ -27,7 +30,14 @@ export const maxDuration = 120;
  */
 const TOTAL_BUDGET_MS = 110_000;
 
-/** Per-hop ceilings, each also clamped to whatever budget is left. */
+/**
+ * Per-hop ceilings, each also clamped to whatever budget is left.
+ *
+ * Gemini gets a deliberately tight one. It answered 20/20 calls between 1.2s
+ * and 2.2s when measured, so anything past 20s means it is broken rather than
+ * slow, and the sooner we give up the more budget the NVIDIA fallback inherits.
+ */
+const GEMINI_TIMEOUT_MS = 20_000;
 const VISION_TIMEOUT_MS = 75_000;
 const FLUX_TIMEOUT_MS = 30_000;
 const WITHOUTBG_TIMEOUT_MS = 15_000;
@@ -55,17 +65,34 @@ function createDeadline(totalMs: number) {
 type Deadline = ReturnType<typeof createDeadline>;
 
 const NVIDIA_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
+const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 
 /**
- * Vision model that turns the photo into an image prompt.
+ * Primary vision model. Benchmarked 2026-07-25 on one photo, interleaved rounds
+ * so every contender shared queue conditions:
+ *
+ *   gemini-3.5-flash-lite   20/20 ok   1.2 / 1.5 / 2.2s   (min/med/max)
+ *   gemini-3.6-flash         5/5  ok   3.9 / 4.3 / 4.7s
+ *   nemotron-nano-12b-v2-vl  5/5  ok   6.7 / 8.1 / 10.0s
+ *   gemma-4-31b-it           1/5  ok   68.9s, rest timed out past 90s
+ *
+ * flash-lite wins on both ends: fastest median and, more importantly here, no
+ * tail at all — it is the tail that was timing the function out and silently
+ * degrading scans to a cropped photo.
+ *
+ * gemini-3.6-flash was rejected despite being newer: it spends ~490 tokens on
+ * reasoning, and because thinking draws from maxOutputTokens it returned prompts
+ * truncated mid-sentence. flash-lite does no thinking at all.
+ */
+const GEMINI_MODEL = process.env.GEMINI_VISION_MODEL || "gemini-3.5-flash-lite";
+
+/**
+ * Fallback vision model, used when Gemini has no key, no credit, or errors.
  *
  * The Android app used google/gemma-3-27b-it, which NVIDIA retired on
- * 2026-05-12 and now answers with 410 Gone — so the original sprite pipeline
- * fails on every scan today. gemma-4-31b-it is the successor and produces the
- * best prompts of the candidates measured, but its latency is the whole reason
- * this route needs a budget: a ~6s median with a tail out past 49s (see the
- * maxDuration note above). meta/llama-3.2-11b-vision-instruct is the fallback
- * if that tail ever matters more than prompt quality.
+ * 2026-05-12 and now answers with 410 Gone. gemma-4-31b-it is the successor and
+ * writes good prompts, but its latency is why it is no longer the primary: it
+ * has been measured at a 6s median one hour and 69s-or-timeout the next.
  *
  * Overridable so the model can be swapped without a redeploy the next time one
  * reaches end of life.
@@ -127,7 +154,13 @@ export async function POST(request: Request) {
 
   try {
     const deadline = createDeadline(TOTAL_BUDGET_MS);
-    const prompt = await describeAsSprite(base64Image, plantName, keys.gemmaApiKey, deadline);
+    const prompt = await describeAsSprite(
+      base64Image,
+      plantName,
+      keys.gemmaApiKey,
+      serverEnv.geminiKey,
+      deadline,
+    );
     const rendered = await renderSprite(prompt, keys.fluxApiKey, deadline);
     // Enhancement, not a hard step: on any failure keep the raw render.
     const cutout = await removeBackground(rendered, serverEnv.withoutbgKey, deadline);
@@ -171,13 +204,8 @@ function toDataUrl(base64: string): string {
  * the rest of the pipeline: the graph-paper backdrop (withoutBG needs a flat white
  * field to cut against) and the 2x2 grid (one plant, one sprite).
  */
-async function describeAsSprite(
-  base64Image: string,
-  plantName: string,
-  apiKey: string,
-  deadline: Deadline,
-): Promise<string> {
-  const instruction =
+function buildInstruction(plantName: string): string {
+  return (
     `This is a photo of ${plantName}. Write an image-generation prompt for an original ` +
     "pixel-art creature design in the style of a retro monster-collecting video game: a " +
     "chubby, big-eyed plant/nature-themed monster drawn from this exact plant. Carry the " +
@@ -191,8 +219,93 @@ async function describeAsSprite(
     "One single creature, front-facing and centered, fully isolated on a solid flat " +
     "pure-white background — no scenery, pot, ground, graph paper or grid backdrop, " +
     "gradient, shadow, or reflection, so it cuts out cleanly. " +
-    "Keep it to 2-3 sentences and output only the prompt, with no preamble.";
+    "Keep it to 2-3 sentences and output only the prompt, with no preamble."
+  );
+}
 
+/**
+ * Turns the photo into an image prompt, preferring Gemini and falling back to
+ * the NVIDIA model.
+ *
+ * The fallback is worth its complexity: Gemini is the fast path but it is also
+ * the one with a prepaid balance that can hit zero mid-session, and a 429 there
+ * would otherwise cost the whole scan. Losing Gemini should mean a slow sprite,
+ * not a photo where a sprite should be.
+ */
+async function describeAsSprite(
+  base64Image: string,
+  plantName: string,
+  apiKey: string,
+  geminiKey: string | null,
+  deadline: Deadline,
+): Promise<string> {
+  const instruction = buildInstruction(plantName);
+
+  if (geminiKey) {
+    try {
+      return await describeWithGemini(base64Image, instruction, geminiKey, deadline);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.warn(`Gemini vision failed, falling back to ${VISION_MODEL}: ${message}`);
+    }
+  }
+  return describeWithNvidia(base64Image, instruction, apiKey, deadline);
+}
+
+/** Google AI Studio path. Returns the prompt text. */
+async function describeWithGemini(
+  base64Image: string,
+  instruction: string,
+  apiKey: string,
+  deadline: Deadline,
+): Promise<string> {
+  const response = await fetch(
+    `${GEMINI_ENDPOINT}/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: instruction },
+              { inline_data: { mime_type: "image/jpeg", data: base64Image } },
+            ],
+          },
+        ],
+        // Measured output is 106-173 tokens; 512 leaves room without inviting an
+        // essay. Note this ceiling also covers reasoning tokens on models that
+        // think — the reason a thinking model can't simply be dropped in here.
+        generationConfig: { maxOutputTokens: 512 },
+      }),
+      signal: deadline.signal(GEMINI_TIMEOUT_MS, "the vision step"),
+    },
+  );
+
+  const raw = await response.text();
+  if (!response.ok) {
+    throw new Error(`Gemini API error ${response.status}: ${raw.slice(0, 300)}`);
+  }
+
+  const candidate = JSON.parse(raw)?.candidates?.[0];
+  const text: string = (candidate?.content?.parts ?? [])
+    .map((part: { text?: string }) => part.text ?? "")
+    .join("")
+    .trim();
+  if (text.length === 0) {
+    // Covers a safety block, which returns a candidate with no parts at all.
+    throw new Error(`Gemini returned no description (finishReason=${candidate?.finishReason}).`);
+  }
+  return text;
+}
+
+/** NVIDIA NIM path — the original implementation, now the fallback. */
+async function describeWithNvidia(
+  base64Image: string,
+  instruction: string,
+  apiKey: string,
+  deadline: Deadline,
+): Promise<string> {
   const response = await fetch(NVIDIA_ENDPOINT, {
     method: "POST",
     headers: {
