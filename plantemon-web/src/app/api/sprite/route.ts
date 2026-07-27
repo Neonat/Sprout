@@ -200,27 +200,80 @@ function toDataUrl(base64: string): string {
  * the sprite is now an original creature *derived* from the plant rather than the
  * literal plant with eyes added.
  *
+ * The earlier version of this instruction handed the model a finished creature —
+ * round chubby body, leaf-wings, flowers on the head, curling vine tail, tiny
+ * clawed feet — and asked it to write that up. Every species came back as the
+ * same blob in a different palette, because the only variable left was colour.
+ * So the body is no longer specified here at all: the instruction asks the model
+ * to find what makes this plant unlike other plants and to let those traits pick
+ * the silhouette, stance and limbs. The one-line "signature trait" step exists to
+ * force that choice before the prose starts, so the description is built around a
+ * specific shape instead of drifting back to the generic mascot.
+ *
+ * A lot of common plant names carry an animal in them — spider lily, snake plant,
+ * tiger lily, elephant ear — and a design that ignores it misses the joke the
+ * name is already making. So the instruction asks for an echo of that animal, but
+ * deliberately a quiet one: it's an accent on a plant-made creature, not a costume
+ * over it, and the plant's form still picks the body. Names with no animal in them
+ * get nothing, which is why the clause says so outright rather than leaving the
+ * model to invent a mascot for "Boston Fern".
+ *
+ * Only the things the pipeline actually depends on stay mandatory: the art style
+ * (so sprites read as one set), a single centered subject, and the flat white
+ * field withoutBG needs to cut against.
+ *
  * Two things in the reference look are deliberately dropped, because they'd break
  * the rest of the pipeline: the graph-paper backdrop (withoutBG needs a flat white
  * field to cut against) and the 2x2 grid (one plant, one sprite).
  */
 function buildInstruction(plantName: string): string {
   return (
-    `This is a photo of ${plantName}. Write an image-generation prompt for an original ` +
-    "pixel-art creature design in the style of a retro monster-collecting video game: a " +
-    "chubby, big-eyed plant/nature-themed monster drawn from this exact plant. Carry the " +
-    "real plant's colours, leaf shapes, and flowers into the creature — its leaves sprout " +
-    "from the sides like wings or curl up like horns, its flowers cluster on its head and " +
-    "body, its stems trail into a curling vine tail — on a round, soft-proportioned body " +
-    "with large expressive eyes, a small friendly face, and tiny clawed or root-like feet. " +
+    `This is a photo of ${plantName}. Design an original pixel-art creature for a retro ` +
+    "monster-collecting video game, inspired by this exact plant, then write the " +
+    "image-generation prompt for it.\n\n" +
+    "First study what makes THIS plant unlike any other plant: its growth habit (upright, " +
+    "bushy, trailing, climbing, rosette, columnar, sprawling), the outline and edge of its " +
+    "leaves, its overall silhouette, its texture (waxy, fuzzy, spiny, ribbed, papery), and " +
+    "its actual colours including any variegation, veining, stem colour or flowers.\n\n" +
+    "Let those traits decide the creature's body — the plant's shape is the design, not a " +
+    "decoration added to a mascot. A spiny plant becomes an angular, bristling creature; a " +
+    "trailing one becomes long, low and coiling; a broad-leaved one becomes heavy and " +
+    "top-shaded; a fine or grassy one becomes small, thin and wispy; a rosette becomes " +
+    "squat and symmetrical. Vary the build, stance, proportions, and number and kind of " +
+    "limbs to match. Do not default to a round chubby body with leaf wings, a flower crown " +
+    "and a curling vine tail — pick the shape only this plant would produce. Give it a " +
+    "face with expressive eyes, and name its real colours.\n\n" +
+    "If the plant's name refers to an animal or creature (spider, snake, tiger, zebra, " +
+    "crane, elephant, fox, lamb, dragon and so on), let a quiet echo of that animal show " +
+    "in the design — a marking, a stance, the shape of an ear, eye or tail, the way it " +
+    "moves. Keep it subtle and secondary: a knowing nod for anyone who reads the name, " +
+    "never a costume. The plant's own form still decides the body, and the creature must " +
+    "stay clearly plant-made. If the name refers to no animal, add none.\n\n" +
     "Style: clean bold black outlines, flat cel-shaded colouring, retro 16-bit pixel art, " +
     "grid-aligned pixels, even lighting, no shadows. Describe only the creature's own " +
     "design — never name or reference any existing game, brand, or character. " +
     "One single creature, front-facing and centered, fully isolated on a solid flat " +
     "pure-white background — no scenery, pot, ground, graph paper or grid backdrop, " +
-    "gradient, shadow, or reflection, so it cuts out cleanly. " +
-    "Keep it to 2-3 sentences and output only the prompt, with no preamble."
+    "gradient, shadow, or reflection, so it cuts out cleanly.\n\n" +
+    "Output exactly two lines and nothing else:\n" +
+    "Signature trait: <the one plant feature driving the design, a few words>\n" +
+    "Prompt: <3-4 sentences, opening with the creature's overall shape and stance>"
   );
+}
+
+/**
+ * Pulls the image prompt out of the two-line reply.
+ *
+ * The "Signature trait:" line is scaffolding — it exists to make the model commit
+ * to a distinguishing feature before it writes, which is what stops every species
+ * collapsing into the same creature. It must not reach Flux, which would render
+ * the label as text in the image. Falls back to the whole reply so a model that
+ * ignores the format still produces a sprite rather than an error.
+ */
+function extractPrompt(reply: string): string {
+  const match = reply.match(/^\s*Prompt:\s*([\s\S]+)$/im);
+  const prompt = (match?.[1] ?? reply.replace(/^\s*Signature trait:.*$/im, "")).trim();
+  return prompt.length > 0 ? prompt : reply.trim();
 }
 
 /**
@@ -243,13 +296,13 @@ async function describeAsSprite(
 
   if (geminiKey) {
     try {
-      return await describeWithGemini(base64Image, instruction, geminiKey, deadline);
+      return extractPrompt(await describeWithGemini(base64Image, instruction, geminiKey, deadline));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       console.warn(`Gemini vision failed, falling back to ${VISION_MODEL}: ${message}`);
     }
   }
-  return describeWithNvidia(base64Image, instruction, apiKey, deadline);
+  return extractPrompt(await describeWithNvidia(base64Image, instruction, apiKey, deadline));
 }
 
 /** Google AI Studio path. Returns the prompt text. */
@@ -273,9 +326,11 @@ async function describeWithGemini(
             ],
           },
         ],
-        // Measured output is 106-173 tokens; 512 leaves room without inviting an
-        // essay. Note this ceiling also covers reasoning tokens on models that
-        // think — the reason a thinking model can't simply be dropped in here.
+        // Measured output was 106-173 tokens before the instruction asked for a
+        // signature-trait line and 3-4 sentences; 512 still leaves plenty of room
+        // without inviting an essay. Note this ceiling also covers reasoning
+        // tokens on models that think — the reason a thinking model can't simply
+        // be dropped in here.
         generationConfig: { maxOutputTokens: 512 },
       }),
       signal: deadline.signal(GEMINI_TIMEOUT_MS, "the vision step"),
@@ -323,7 +378,9 @@ async function describeWithNvidia(
           ],
         },
       ],
-      max_tokens: 256,
+      // 256 was sized for the old 2-3 sentence prompt; the reply now also carries
+      // a signature-trait line, and a truncated prompt is a truncated sprite.
+      max_tokens: 400,
     }),
     signal: deadline.signal(VISION_TIMEOUT_MS, "the vision step"),
   });
