@@ -210,13 +210,29 @@ function toDataUrl(base64: string): string {
  * force that choice before the prose starts, so the description is built around a
  * specific shape instead of drifting back to the generic mascot.
  *
+ * Dropping the fixed body also dropped the only thing that made the creatures
+ * cute, and "spider lily" promptly came back as a spindly, angular thing with
+ * arachnid symmetry — accurate, and no good for a children's game. So charm is
+ * now its own requirement, deliberately written in terms of the face and the
+ * finish (eye size and spacing, head-to-body ratio, blunted tips, posture)
+ * rather than the body, because those vary independently of silhouette: an
+ * angular creature can be adorable, so the charm floor doesn't undo the variety.
+ * The banned list is explicit because "cute" alone doesn't stop a model from
+ * drawing anatomically faithful legs.
+ *
  * A lot of common plant names carry an animal in them — spider lily, snake plant,
  * tiger lily, elephant ear — and a design that ignores it misses the joke the
  * name is already making. So the instruction asks for an echo of that animal, but
  * deliberately a quiet one: it's an accent on a plant-made creature, not a costume
- * over it, and the plant's form still picks the body. Names with no animal in them
- * get nothing, which is why the clause says so outright rather than leaving the
- * model to invent a mascot for "Boston Fern".
+ * over it, and the plant's form still picks the body. The echo is the part most
+ * likely to turn creepy, since a faithful spider or snake is exactly what a
+ * child's game doesn't want, so it gets worked examples of the cute reading.
+ * Names with no animal in them get nothing, which is why the clause says so
+ * outright rather than leaving the model to invent a mascot for "Boston Fern".
+ *
+ * The word "cute" also has to survive into the prompt itself: Flux never sees
+ * this instruction, only the sentences the vision model writes, so the output
+ * format asks for it in so many words.
  *
  * Only the things the pipeline actually depends on stay mandatory: the art style
  * (so sprites read as one set), a single centered subject, and the flat white
@@ -243,12 +259,23 @@ function buildInstruction(plantName: string): string {
     "limbs to match. Do not default to a round chubby body with leaf wings, a flower crown " +
     "and a curling vine tail — pick the shape only this plant would produce. Give it a " +
     "face with expressive eyes, and name its real colours.\n\n" +
+    "Whatever shape you choose, it must be cute — this is a friendly companion for young " +
+    "children. Charm comes from the face and the finish, not from one fixed body, so a " +
+    "spiky, lanky or angular creature can and should still be adorable: give it large warm " +
+    "eyes set well apart, a small soft smiling mouth, a head large for its body, rounded " +
+    "and blunted tips wherever the plant's form would otherwise come to a point, and a " +
+    "relaxed, welcoming posture. Never menacing, creepy, spooky, gloomy, fierce, sinister " +
+    "or realistic — no fangs, claws, staring or multiple eyes, gnarled or hairy limbs, " +
+    "gaping mouths, dark or muddy palettes, or true-to-life animal or insect anatomy.\n\n" +
     "If the plant's name refers to an animal or creature (spider, snake, tiger, zebra, " +
     "crane, elephant, fox, lamb, dragon and so on), let a quiet echo of that animal show " +
     "in the design — a marking, a stance, the shape of an ear, eye or tail, the way it " +
     "moves. Keep it subtle and secondary: a knowing nod for anyone who reads the name, " +
-    "never a costume. The plant's own form still decides the body, and the creature must " +
-    "stay clearly plant-made. If the name refers to no animal, add none.\n\n" +
+    "never a costume. Cute-ify the echo rather than copying the real animal: a spider " +
+    "becomes a bouncy round body on short springy legs, never a realistic arachnid; a " +
+    "snake becomes a smiling coil; a tiger becomes soft round stripes on a plump cub. The " +
+    "plant's own form still decides the body, and the creature must stay clearly " +
+    "plant-made. If the name refers to no animal, add none.\n\n" +
     "Style: clean bold black outlines, flat cel-shaded colouring, retro 16-bit pixel art, " +
     "grid-aligned pixels, even lighting, no shadows. Describe only the creature's own " +
     "design — never name or reference any existing game, brand, or character. " +
@@ -257,7 +284,8 @@ function buildInstruction(plantName: string): string {
     "gradient, shadow, or reflection, so it cuts out cleanly.\n\n" +
     "Output exactly two lines and nothing else:\n" +
     "Signature trait: <the one plant feature driving the design, a few words>\n" +
-    "Prompt: <3-4 sentences, opening with the creature's overall shape and stance>"
+    "Prompt: <3-4 sentences, opening with the creature's overall shape and stance, and " +
+    "saying plainly that it is cute and friendly>"
   );
 }
 
