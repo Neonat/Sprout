@@ -264,6 +264,15 @@ function buildInstruction(plantName: string): string {
     "limbs to match. Do not default to a round chubby body with leaf wings, a flower crown " +
     "and a curling vine tail — pick the shape only this plant would produce. Give it a " +
     "face with expressive eyes, and name its real colours.\n\n" +
+    "Someone who knows this plant must recognise which plant it is at a glance. The " +
+    "creature's outline has to carry the plant's most identifiable feature — the one from " +
+    "the signature trait line — as its main shape, not as a small decoration. Name that " +
+    "feature concretely in the prompt: not \"leafy\" or \"plant-like\" or \"foliage\", but " +
+    "the real form, such as long strap-like arching leaves with a pale central stripe, or " +
+    "flat paddle pads edged in fine hairs, or a tight rosette of thick pointed rosettes. " +
+    "Vague filler is the main way a design collapses into an anonymous round blob, so " +
+    "prefer the specific word every time. Soften the tips of pointed forms, but keep them " +
+    "clearly pointed — do not round a distinctive shape away into a ball.\n\n" +
     "Whatever shape you choose, it must be cute — this is a friendly companion for young " +
     "children. There is no single cute template, so design this creature's own face and " +
     "build rather than reusing a standard one. Give it a small personality drawn from the " +
@@ -275,8 +284,9 @@ function buildInstruction(plantName: string): string {
     "wherever its form invites them; a mouth that is a small smile, an open cheerful grin, " +
     "a tiny curve or a shy line; rosy cheeks, freckles, leafy brows or nothing at all. " +
     "Proportions vary too — chibi and top-heavy, tall and slender, squat and wide, or long " +
-    "and low — as long as it reads warm and approachable. Blunt whatever the plant would " +
-    "sharpen into a point, and keep the posture relaxed and welcoming. A spiky, lanky or " +
+    "and low — as long as it reads warm and approachable. Take the edge off whatever the " +
+    "plant would sharpen into a point, without losing the shape itself, and keep the " +
+    "posture relaxed and welcoming. A spiky, lanky or " +
     "angular creature can and should still be adorable. " +
     "Never menacing, creepy, spooky, gloomy, fierce, sinister " +
     "or realistic — no fangs, claws, staring or multiple eyes, gnarled or hairy limbs, " +
@@ -313,9 +323,11 @@ function buildInstruction(plantName: string): string {
     "Signature trait: <the one plant feature driving the design, a few words>\n" +
     "Prompt: <3-4 sentences that must begin with exactly these words — \"Flat 2D chunky " +
     "low-resolution pixel-art sprite of a cute, friendly plant creature\" — then, still " +
-    "inside that first sentence, the particular face you designed for it, and after that " +
-    "its shape, stance and colours. The face has to sit in the first sentence or the " +
-    "image model leaves it off. End the last sentence " +
+    "inside that first sentence, the signature trait rendered as the creature's overall " +
+    "shape, in concrete words, and then the particular face you designed for it. Both the " +
+    "shape and the face have to sit in that first sentence: the image model weighs the " +
+    "opening hardest and drops whatever comes later. Use the remaining sentences for " +
+    "colours, markings and stance. End the last sentence " +
     "with \"no 3D rendering, no gloss, no gradients.\">"
   );
 }
