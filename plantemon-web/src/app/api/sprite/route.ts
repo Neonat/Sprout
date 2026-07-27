@@ -252,10 +252,11 @@ function buildInstruction(plantName: string): string {
     "leaves, its overall silhouette, its texture (waxy, fuzzy, spiny, ribbed, papery), and " +
     "its actual colours including any variegation, veining, stem colour or flowers.\n\n" +
     "Let those traits decide the creature's body — the plant's shape is the design, not a " +
-    "decoration added to a mascot. A spiny plant becomes an angular, bristling creature; a " +
-    "trailing one becomes long, low and coiling; a broad-leaved one becomes heavy and " +
-    "top-shaded; a fine or grassy one becomes small, thin and wispy; a rosette becomes " +
-    "squat and symmetrical. Vary the build, stance, proportions, and number and kind of " +
+    "decoration added to a mascot. A spiny plant becomes a stout creature studded with " +
+    "soft blunt prickles; a trailing one becomes a long, low, happily coiling one; a " +
+    "broad-leaved one becomes round and leafy-topped; a fine or grassy one becomes small " +
+    "and tufty; a rosette becomes squat and symmetrical. Vary the build, stance, " +
+    "proportions, and number and kind of " +
     "limbs to match. Do not default to a round chubby body with leaf wings, a flower crown " +
     "and a curling vine tail — pick the shape only this plant would produce. Give it a " +
     "face with expressive eyes, and name its real colours.\n\n" +
@@ -271,21 +272,37 @@ function buildInstruction(plantName: string): string {
     "crane, elephant, fox, lamb, dragon and so on), let a quiet echo of that animal show " +
     "in the design — a marking, a stance, the shape of an ear, eye or tail, the way it " +
     "moves. Keep it subtle and secondary: a knowing nod for anyone who reads the name, " +
-    "never a costume. Cute-ify the echo rather than copying the real animal: a spider " +
-    "becomes a bouncy round body on short springy legs, never a realistic arachnid; a " +
-    "snake becomes a smiling coil; a tiger becomes soft round stripes on a plump cub. The " +
-    "plant's own form still decides the body, and the creature must stay clearly " +
-    "plant-made. If the name refers to no animal, add none.\n\n" +
-    "Style: clean bold black outlines, flat cel-shaded colouring, retro 16-bit pixel art, " +
-    "grid-aligned pixels, even lighting, no shadows. Describe only the creature's own " +
+    "never a costume. It is always a plant creature that faintly recalls the animal in one " +
+    "or two details — never the animal itself. Do not give it the animal's body plan, head " +
+    "or limb count, and never call it a spider creature, a snake creature and so on: a " +
+    "spider lily might simply space its petal-limbs evenly around a round body, a snake " +
+    "plant might carry soft banded markings, a tiger lily a few round spots. One cue is " +
+    "enough, and if in doubt leave it out. The plant's own form still decides the body, " +
+    "and the creature must stay obviously plant-made. If the name refers to no animal, " +
+    "add none.\n\n" +
+    "Style: chunky low-resolution pixel art, like a tiny sprite from a 1990s handheld game " +
+    "shown large — big square grid-aligned pixels with visibly stepped edges, a small " +
+    "palette of a few flat bright colours, clean bold outlines, simple rounded readable " +
+    "shapes with very little interior detail, even lighting and no shadows. Kawaii chibi " +
+    "proportions: big head, small rounded body, stubby limbs. The face is simple and " +
+    "doll-like — two big round friendly eyes, each with a small white highlight dot, and a " +
+    "tiny curved smile; no eyebrows, teeth, nostrils, or extra eyes. Cheerful storybook " +
+    "colours: bright soft greens, warm pinks and sunny yellows, never dark or murky. It " +
+    "must be flat 2D pixel art — never a 3D render, never glossy, metallic, shiny, " +
+    "plastic, clay, a toy figurine or a photograph, and with no smooth gradients, " +
+    "highlights or soft airbrushed shading. Nothing detailed, painterly, " +
+    "realistic, gritty, gothic or high-contrast. Describe only the creature's own " +
     "design — never name or reference any existing game, brand, or character. " +
     "One single creature, front-facing and centered, fully isolated on a solid flat " +
     "pure-white background — no scenery, pot, ground, graph paper or grid backdrop, " +
     "gradient, shadow, or reflection, so it cuts out cleanly.\n\n" +
     "Output exactly two lines and nothing else:\n" +
     "Signature trait: <the one plant feature driving the design, a few words>\n" +
-    "Prompt: <3-4 sentences, opening with the creature's overall shape and stance, and " +
-    "saying plainly that it is cute and friendly>"
+    "Prompt: <3-4 sentences that must begin with exactly these words — \"Flat 2D chunky " +
+    "low-resolution pixel-art sprite of a cute, friendly plant creature with a big smiling " +
+    "face, two large round eyes and rosy cheeks\" — and then its " +
+    "shape and stance, and its colours. End the last sentence " +
+    "with \"no 3D rendering, no gloss, no gradients.\">"
   );
 }
 
