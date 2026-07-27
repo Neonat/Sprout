@@ -213,12 +213,16 @@ function toDataUrl(base64: string): string {
  * Dropping the fixed body also dropped the only thing that made the creatures
  * cute, and "spider lily" promptly came back as a spindly, angular thing with
  * arachnid symmetry — accurate, and no good for a children's game. So charm is
- * now its own requirement, deliberately written in terms of the face and the
- * finish (eye size and spacing, head-to-body ratio, blunted tips, posture)
- * rather than the body, because those vary independently of silhouette: an
- * angular creature can be adorable, so the charm floor doesn't undo the variety.
- * The banned list is explicit because "cute" alone doesn't stop a model from
- * drawing anatomically faithful legs.
+ * its own requirement now. The banned list is explicit because "cute" alone
+ * doesn't stop a model from drawing anatomically faithful legs.
+ *
+ * Charm is asked for as a range rather than a design: pick from these kinds of
+ * eyes, these kinds of mouths, these proportions. An earlier version named one
+ * face — big round eyes, rosy cheeks, chibi build — and pinned it in every
+ * prompt, which held the vibe but made the creatures siblings from the neck up.
+ * The split to hold onto is that the *medium* is fixed (chunky low-res pixel
+ * art, flat colour, bold outline, white field) and the *design* is not: sameness
+ * of vibe should come from the rendering, never from reissuing one creature.
  *
  * A lot of common plant names carry an animal in them — spider lily, snake plant,
  * tiger lily, elephant ear — and a design that ignores it misses the joke the
@@ -261,11 +265,20 @@ function buildInstruction(plantName: string): string {
     "and a curling vine tail — pick the shape only this plant would produce. Give it a " +
     "face with expressive eyes, and name its real colours.\n\n" +
     "Whatever shape you choose, it must be cute — this is a friendly companion for young " +
-    "children. Charm comes from the face and the finish, not from one fixed body, so a " +
-    "spiky, lanky or angular creature can and should still be adorable: give it large warm " +
-    "eyes set well apart, a small soft smiling mouth, a head large for its body, rounded " +
-    "and blunted tips wherever the plant's form would otherwise come to a point, and a " +
-    "relaxed, welcoming posture. Never menacing, creepy, spooky, gloomy, fierce, sinister " +
+    "children. There is no single cute template, so design this creature's own face and " +
+    "build rather than reusing a standard one. Give it a small personality drawn from the " +
+    "plant's character — bold, shy, sleepy, cheeky, serene, proud, eager — and let the " +
+    "eyes and mouth express that one, so that no two species arrive wearing the same " +
+    "expression; plain dot eyes and a small smile are one option among many, not the " +
+    "default. Let the plant suggest the features: eyes big " +
+    "and round, or half-closed and content, or sleepy, or sparkling, or simple dots, set " +
+    "wherever its form invites them; a mouth that is a small smile, an open cheerful grin, " +
+    "a tiny curve or a shy line; rosy cheeks, freckles, leafy brows or nothing at all. " +
+    "Proportions vary too — chibi and top-heavy, tall and slender, squat and wide, or long " +
+    "and low — as long as it reads warm and approachable. Blunt whatever the plant would " +
+    "sharpen into a point, and keep the posture relaxed and welcoming. A spiky, lanky or " +
+    "angular creature can and should still be adorable. " +
+    "Never menacing, creepy, spooky, gloomy, fierce, sinister " +
     "or realistic — no fangs, claws, staring or multiple eyes, gnarled or hairy limbs, " +
     "gaping mouths, dark or muddy palettes, or true-to-life animal or insect anatomy.\n\n" +
     "If the plant's name refers to an animal or creature (spider, snake, tiger, zebra, " +
@@ -274,7 +287,8 @@ function buildInstruction(plantName: string): string {
     "moves. Keep it subtle and secondary: a knowing nod for anyone who reads the name, " +
     "never a costume. It is always a plant creature that faintly recalls the animal in one " +
     "or two details — never the animal itself. Do not give it the animal's body plan, head " +
-    "or limb count, and never call it a spider creature, a snake creature and so on: a " +
+    "or limb count, and never call it a spider creature, a snake creature and so on, nor " +
+    "use words like arachnid, eight-legged, serpentine or feline anywhere in the prompt: a " +
     "spider lily might simply space its petal-limbs evenly around a round body, a snake " +
     "plant might carry soft banded markings, a tiger lily a few round spots. One cue is " +
     "enough, and if in doubt leave it out. The plant's own form still decides the body, " +
@@ -283,10 +297,9 @@ function buildInstruction(plantName: string): string {
     "Style: chunky low-resolution pixel art, like a tiny sprite from a 1990s handheld game " +
     "shown large — big square grid-aligned pixels with visibly stepped edges, a small " +
     "palette of a few flat bright colours, clean bold outlines, simple rounded readable " +
-    "shapes with very little interior detail, even lighting and no shadows. Kawaii chibi " +
-    "proportions: big head, small rounded body, stubby limbs. The face is simple and " +
-    "doll-like — two big round friendly eyes, each with a small white highlight dot, and a " +
-    "tiny curved smile; no eyebrows, teeth, nostrils, or extra eyes. Cheerful storybook " +
+    "shapes with very little interior detail, even lighting and no shadows. Kawaii, " +
+    "toy-like and simply drawn: whatever face you chose, render it with a handful of " +
+    "chunky pixels rather than fine detail. Cheerful storybook " +
     "colours: bright soft greens, warm pinks and sunny yellows, never dark or murky. It " +
     "must be flat 2D pixel art — never a 3D render, never glossy, metallic, shiny, " +
     "plastic, clay, a toy figurine or a photograph, and with no smooth gradients, " +
@@ -299,9 +312,10 @@ function buildInstruction(plantName: string): string {
     "Output exactly two lines and nothing else:\n" +
     "Signature trait: <the one plant feature driving the design, a few words>\n" +
     "Prompt: <3-4 sentences that must begin with exactly these words — \"Flat 2D chunky " +
-    "low-resolution pixel-art sprite of a cute, friendly plant creature with a big smiling " +
-    "face, two large round eyes and rosy cheeks\" — and then its " +
-    "shape and stance, and its colours. End the last sentence " +
+    "low-resolution pixel-art sprite of a cute, friendly plant creature\" — then, still " +
+    "inside that first sentence, the particular face you designed for it, and after that " +
+    "its shape, stance and colours. The face has to sit in the first sentence or the " +
+    "image model leaves it off. End the last sentence " +
     "with \"no 3D rendering, no gloss, no gradients.\">"
   );
 }
