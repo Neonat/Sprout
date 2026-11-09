@@ -2,6 +2,23 @@
 
 A Pokémon-inspired Android game where you scan real plants to create digital creatures that battle each other. Point your camera at any plant, and Plantemon identifies the species, generates a pixel-art sprite using AI, and adds it to your garden — where it can learn moves based on its real-world botanical taxonomy and fight other plants in turn-based battles.
 
+## Repository role and related projects
+
+**Android implementation:** start in [`Plantemon/`](Plantemon/), the Java Android
+project documented below. This repository's default branch is `infosys`; it is a
+fork of [gxy812/katsu-an-g4ng](https://github.com/gxy812/katsu-an-g4ng) with local
+development retained. The separate [`plantemon-app/`](plantemon-app/README.md)
+Expo client and [`plantemon-server/`](plantemon-server/README.md) API are also
+retained here with their own setup guides.
+
+| Repository | Role |
+|---|---|
+| [Sprout](https://github.com/Neonat/Sprout) — this repository | Java Android game, plus the Expo client and API port above. |
+| [sprout_esc](https://github.com/Neonat/sprout_esc) | Separate TypeScript web game: React, Express and Firestore. |
+| [Sprout_Dev_Platform](https://github.com/Neonat/Sprout_Dev_Platform) | Private operations studio for sprite generation, evaluation and review; access required. |
+| [v0-plantemon](https://github.com/Neonat/v0-plantemon) | Private early Next.js/v0 browser prototype; access required. |
+| [v0-plantemon-android-app](https://github.com/Neonat/v0-plantemon-android-app) | Private empty placeholder; the Android implementation is in `Plantemon/` here. |
+
 ![Poster](./docs/Infosys_Poster.png)
 ---
 
