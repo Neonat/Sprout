@@ -1,6 +1,8 @@
-# Plantemon
+# Sprout Android (Plantemon)
 
-A Pokémon-inspired Android game where you scan real plants to create digital creatures that battle each other. Point your camera at any plant, and Plantemon identifies the species, generates a pixel-art sprite using AI, and adds it to your garden — where it can learn moves based on its real-world botanical taxonomy and fight other plants in turn-based battles.
+Sprout's native Java Android game, originally named **Plantemon**. Scan real plants to create digital creatures that battle each other. Point your camera at any plant, and Plantemon identifies the species, generates a pixel-art sprite using AI, and adds it to your garden — where it can learn moves based on its real-world botanical taxonomy and fight other plants in turn-based battles.
+
+[Features](#features) · [Screenshots](#screenshots) · [Setup](#getting-started) · [Architecture](#architecture) · [Build configuration](#build-configuration)
 
 ## Repository role and related projects
 
@@ -9,15 +11,17 @@ project documented below. This repository's default branch is `infosys`; it is a
 fork of [gxy812/katsu-an-g4ng](https://github.com/gxy812/katsu-an-g4ng) with local
 development retained. The separate [`plantemon-app/`](plantemon-app/README.md)
 Expo client and [`plantemon-server/`](plantemon-server/README.md) API are also
-retained here with their own setup guides.
+retained here with their own setup guides. They are independent ports; the
+native Android setup below applies to `Plantemon/`. The source folder, Java
+packages and app label retain the Plantemon name.
 
 | Repository | Role |
 |---|---|
-| [Sprout](https://github.com/Neonat/Sprout) — this repository | Java Android game, plus the Expo client and API port above. |
-| [sprout_esc](https://github.com/Neonat/sprout_esc) | Separate TypeScript web game: React, Express and Firestore. |
-| [Sprout_Dev_Platform](https://github.com/Neonat/Sprout_Dev_Platform) | Private operations studio for sprite generation, evaluation and review; access required. |
-| [v0-plantemon](https://github.com/Neonat/v0-plantemon) | Private early Next.js/v0 browser prototype; access required. |
-| [v0-plantemon-android-app](https://github.com/Neonat/v0-plantemon-android-app) | Private empty placeholder; the Android implementation is in `Plantemon/` here. |
+| [sprout-android](https://github.com/Neonat/sprout-android) — this repository | Java Android game, plus the Expo client and API port above. |
+| [sprout-web](https://github.com/Neonat/sprout-web) | Separate TypeScript web game: React, Express and Firestore. |
+| [sprout-studio](https://github.com/Neonat/sprout-studio) | Private operations studio for sprite generation, evaluation and review; access required. |
+| [sprout-web-prototype](https://github.com/Neonat/sprout-web-prototype) | Private early Next.js/v0 browser prototype; access required. |
+| [sprout-android-placeholder](https://github.com/Neonat/sprout-android-placeholder) | Private empty placeholder; the Android implementation is in `Plantemon/` here. |
 
 ![Poster](./docs/Infosys_Poster.png)
 ---
@@ -47,14 +51,15 @@ retained here with their own setup guides.
 
 ### Requirements
 
-- Android Studio Hedgehog or newer
-- Android SDK 29+ (minSdk 29, Android 10)
+- Android Studio and a Gradle JDK compatible with the checked-in Android Gradle Plugin `9.1.0` and Gradle wrapper `9.4.0`
+- Android SDK matching `compileSdk = 36` and `compileSdkMinor = 1`
 - A physical device or emulator running Android 10+
 - API keys for Plant.id and NVIDIA (see below)
 
 ### API Keys
 
-Create a `local.properties` file in the project root (same level as `gradle.properties`) and add:
+Create `Plantemon/local.properties` beside the Android project's
+`gradle.properties`, and add your provider keys:
 
 ```
 PLANT_API_KEY=your_plant_id_key_here
@@ -62,24 +67,38 @@ NVIDIA_API_KEY=your_nvidia_key_here
 FLUX_API_KEY=your_nvidia_key_here
 ```
 
-- **Plant.id** — sign up at [plant.id](https://plant.id) for an API key (free tier available)
+- **Plant.id** — sign up at [plant.id](https://plant.id) for an API key
 - **NVIDIA** — sign up at [build.nvidia.com](https://build.nvidia.com) for an API key; the same key is used for both the NIM (Gemma-3) and Flux image generation endpoints
 
 > `local.properties` is git-ignored. Never commit API keys.
 
 ### Build & Run
 
-1. Clone the repository
-2. Open the `Plantemon/` directory in Android Studio
-3. Add `local.properties` with your API keys (see above)
-4. Sync Gradle and run on a device or emulator
+```bash
+git clone --branch infosys https://github.com/Neonat/sprout-android.git
+cd sprout-android/Plantemon
+```
+
+1. Open this `Plantemon/` directory in Android Studio.
+2. Configure the Android SDK and Gradle JDK, then add `local.properties` as above.
+3. Sync Gradle and run the `app` module on an Android 10+ device or emulator.
+
+The checked-in [Android CI workflow](.github/workflows/android.yml) targets
+`infosys`. Builds, device behaviour and live provider calls have not been
+revalidated for this README update. `SwitchAction` is retained as an
+inactive placeholder in the battle implementation.
 
 ---
 
 ## Project Structure
 
-```
-app/src/main/java/com/g4ng/
+The native application source is under [`Plantemon/app/`](Plantemon/app/).
+The separate [`plantemon-app/`](plantemon-app/README.md) and
+[`plantemon-server/`](plantemon-server/README.md) trees have their own dependency
+and environment setup.
+
+```text
+Plantemon/app/src/main/java/com/g4ng/
 ├── ui/
 │   ├── Plantemon.java              Application class; initialises databases, loads saved garden on startup
 │   ├── GameState.java              Singleton holding the live Player instance ("Bob") and garden list
@@ -253,7 +272,7 @@ Camera permission is requested at runtime the first time the Scan button is tapp
 
 ## Raw Data Files
 
-Located in `app/src/main/res/raw/`:
+Located in `Plantemon/app/src/main/res/raw/`:
 
 **`moves.json`** — array of move definitions:
 ```json
@@ -299,3 +318,11 @@ com.squareup.okhttp3:okhttp:5.3.2
 | AGP | 9.1.0 |
 
 API keys are injected as `BuildConfig` fields at compile time from `local.properties`. The app will compile without the keys but API calls will fail with 401 errors at runtime.
+
+## Context and licence
+
+This repository retains its fork relationship with
+[gxy812/katsu-an-g4ng](https://github.com/gxy812/katsu-an-g4ng) and its own local
+development history. The upstream [MIT licence and copyright notice](LICENSE)
+remain in place. Related Sprout repositories are separate implementations and
+should be reviewed independently before copying changes between them.
