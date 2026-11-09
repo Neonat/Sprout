@@ -4,6 +4,31 @@ Sprout's native Java Android game, originally named **Plantemon**. Scan real pla
 
 [Features](#features) · [Screenshots](#screenshots) · [Setup](#getting-started) · [Architecture](#architecture) · [Build configuration](#build-configuration)
 
+## Project story and recognition
+
+Sprout is an AI project founded by Nathaniel Sim, exploring tourism and plant
+diversity through plant discovery and collectible creatures. The Android game,
+web game and operations studio are separate parts of the wider project.
+
+The [public project summary](https://www.linkedin.com/in/nathaniel-sim/details/experience/)
+records the following recognition for **Sprout and its project teams**:
+
+- Best-project awards in SUTD **50.001 Information Systems and Programming** and
+  **50.003 Elements of Software Construction**.
+- A **S$2,000 grant** from SUTD's **Baby Shark Fund**.
+- The **Dell Book Prize**, with a **S$1,500 cash award**.
+
+These are project-level recognitions across Sprout's development; the repository
+role and team attribution below identify the implementation represented here.
+
+## Nathaniel's contribution
+
+The preserved collaborative history records Nathaniel Sim's
+[scan-screen interface work](https://github.com/Neonat/sprout-android/commit/3b23cc8b715fc98c0f2c75624a8966121fad47f1) and the later
+[cross-platform TypeScript port](https://github.com/Neonat/sprout-android/commit/d4edcf7de06f7300445edf69d3f2755ca1b1d054) retained
+alongside the native Java Android game. The Android game, Expo client and API
+port have their own source trees and setup instructions, described below.
+
 ## Repository role and related projects
 
 **Android implementation:** start in [`Plantemon/`](Plantemon/), the Java Android
